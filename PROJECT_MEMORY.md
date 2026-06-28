@@ -2,6 +2,30 @@
 
 ## Latest Update
 
+**2026-06-28 — Promo banner Persiapantubel di sticky header, redesign transparan dengan Playfair Display, dan deploy production.**
+
+Perubahan dikerjakan di branch `feat/promo-header`, di-merge ke `main`, dan di-deploy ke Vercel production.
+
+- **Promo banner di tengah header:**
+  - Menambahkan kalimat promosi ajakan daftar kelas gelombang terakhir Persiapantubel di area tengah sticky header, sesuai referensi kotak merah pada `update/5-header.png`.
+  - Teks promo:
+    - "Daftar Kelas Gelombang Terakhir Sekarang!"
+    - "Kuota Tersisa: 11!"
+    - "Klik s.id/tubelstan"
+  - Banner transparan tanpa background/kolom; hanya bermain warna font dengan highlight merah pada kuota dan link brand yang klikabel.
+  - Menggunakan CSS Grid `1fr auto 1fr` agar promo selalu terpusat secara horizontal, sementara judul/subtitle panjang di kiri tetap bisa wrap ke bawah tanpa mendorong promo.
+  - Font promo menggunakan `Playfair Display` (serif) untuk kesan mewah; teks judul & link tetap DM Sans.
+  - File: `components/sticky-page-header.tsx`, `app/layout.tsx`, `tailwind.config.ts`.
+
+- **Verifikasi & deploy:**
+  - `npm run typecheck`, `npm run lint`, dan `npm run build` lolos tanpa error.
+  - Branch `feat/promo-header` → conventional commit (`feat(ui): add Playfair Display promo banner in sticky header`) → push → merge → push `main`.
+  - Deploy Vercel production: https://checklist-peserta-kemenkeu-dan-klpd.vercel.app
+
+---
+
+## Latest Update
+
 **2026-06-28 — Update label section dengan referensi resmi, hyperlink aktif, dan reorder Checklist Dokumen ke atas.**
 
 Perubahan dikerjakan di branch `update-label-checklist`, di-merge ke `main`, dan di-deploy ke Vercel production.
@@ -117,37 +141,45 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 - **Saat menormalisasi label, pertahankan ID lama untuk kompatibilitas localStorage.** Mengubah label menjadi slug untuk ID akan mereset progress pengguna yang tersimpan di browser. Dengan memisahkan `id` (dari header asli) dan `label` (ternormalisasi), data progres tetap valid.
 - **Menambahkan field `subject` lebih bersih daripada parse label di render time.** Grouping di komponen menjadi lebih sederhana dan type-safe; parsing regex hanya sebagai fallback.
 - **Pewarnaan sub-bagian memerlukan kontras yang cukup dan ikon yang jelas.** Kombinasi border-top tebal + header background tinted + ikon kecil membuat perbedaan subjek terlihat bahkan saat di-scroll cepat.
+- **CSS Grid `1fr auto 1fr` sangat efektif untuk membuat elemen center tetap terpusat di antara dua blok fleksibel.** Lebih dapat diprediksi daripada flexbox dengan auto-margin saat salah satu sisi punya teks panjang yang harus wrap.
+- **Spotlight UI tidak selalu membutuhkan background/card.** Dengan hierarki tipografi yang kuat (font serif mewah + warna highlight + underline), promosi transparan tetap menarik perhatian tanpa mengganggu kebersihan header.
+- **Menambahkan font display melalui `next/font/google` murah dan aman.** Cukup tambahkan variabel CSS dan daftarkan di `tailwind.config.ts`; tidak perlu manual preload atau FOIC handling.
+- **Pastikan elemen spotlight memiliki lebar tetap (fixed/min-width) agar tidak "terdorong" oleh konten sekitarnya.** Elemen penting harus menjadi anchor; elemen pendukunglah yang menyesuaikan.
 
 ## Next Action Recommended
 
-1. **Isi container Link Penting dengan URL format dokumen**
+1. **Verifikasi tampilan promo header di production pada berbagai ukuran layar**
+   Target: https://checklist-peserta-kemenkeu-dan-klpd.vercel.app
+   Mengapa: Font Playfair Display di ukuran kecil butuh dicek agar tetap readable; pastikan tidak overlap dengan judul/logo di mobile.
+
+2. **Isi container Link Penting dengan URL format dokumen**
    File: `scripts/extract-checklist-data.py` (sumber link dari Excel) atau konfigurasi terpisah, lalu regenerate `lib/data/checklist-data.ts`.
    Mengapa: Placeholder sudah diupdate; container UI sudah siap. Mengisi link akan menyelesaikan fitur ini sepenuhnya.
 
-2. **Verifikasi URL link eksternal secara berkala**
+3. **Verifikasi URL link eksternal secara berkala**
    Link: `s.id/PMK-Tubel-Kemenkeu`, `s.id/Tubel-DJBC-2026`, `s.id/Tubel-DJPb-2026`, `s.id/Tubel-DJP-2026`, `s.id/PENG-Tubel-2026`, `https://taplink.cc/formulirspmbpt2026`.
    Mengapa: Shortlink atau halaman eksternal bisa berubah; verifikasi memastikan pengguna tidak mengalami broken link.
 
-3. **Tambahkan badge/tanda visual untuk item yang memerlukan perhatian khusus**
+4. **Tambahkan badge/tanda visual untuk item yang memerlukan perhatian khusus**
    File: `components/checklist-row.tsx`.
    Mengapa: Beberapa item punya `rawFlag` seperti "Wajib untuk DJBC" yang belum ditampilkan di UI; menampilkannya membantu pengguna memahami konteks khusus.
 
-4. **Pindahkan repo keluar dari Desktop (opsional tapi direkomendasikan)**
+5. **Pindahkan repo keluar dari Desktop (opsional tapi direkomendasikan)**
    Target: `~/codex/checklist-peserta-kemenkeu-dan-klpd` atau lokasi non-Desktop lain.
    Mengapa: Menghindari masalah permission macOS (`EPERM`) saat development lokal.
 
-5. **Update README fitur**
+6. **Update README fitur**
    File: `README.md`.
    Mengapa: Dokumentasi perlu mencerminkan label section terbaru, hyperlink referensi, dan urutan section yang diubah.
 
-6. **Upgrade Next.js ke versi patched**
+7. **Upgrade Next.js ke versi patched**
    File: `package.json`.
    Mengapa: Next.js 14.2.21 memiliki vulnerability yang diumumkan; upgrade ke 14.2.28+ atau 15.x.
 
-7. **Tambahkan analytics/error tracking (opsional)**
+8. **Tambahkan analytics/error tracking (opsional)**
    Mengapa: Untuk memantau penggunaan aplikasi setelah go-live.
 
-8. **Custom domain (opsional)**
+9. **Custom domain (opsional)**
    Mengapa: URL Vercel bawaan panjang; custom domain meningkatkan trust dan kemudahan akses.
 
 ## Status Proyek
@@ -171,6 +203,7 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 | KLPD Unit Kerja dokumen items added | ✅ Done |
 | Section labels with official references & links | ✅ Done |
 | Reorder: Data Awal → Dokumen → Non-Dokumen | ✅ Done |
+| Promo banner sticky header (Playfair Display, transparan) | ✅ Done |
 | Quality gate | ✅ Passed |
 | GitHub repo | ✅ Done |
 | Vercel deploy | ✅ Live |
