@@ -18,6 +18,17 @@ def clean_header(value):
     return str(value).strip()
 
 
+# Fields in "Data Awal" that should not be rendered nor counted in progress.
+HIDDEN_DATA_AWAL_LABELS = {
+    "Unit/Satuan Kerja",
+    "Nama PIC Unit/Satuan Kerja",
+    "NIP",
+    "NAMA",
+    "EMAIL",
+    "ID INSTANSI",
+}
+
+
 def parse_flag(value, cluster: str | None = None):
     if pd.isna(value):
         return False
@@ -88,10 +99,10 @@ def extract_checklist(path: Path, sheet_name: str, cluster: str | None = None):
                     continue
 
         flag_value = flags[idx] if idx < len(flags) else ""
-        # Data Awal fields are always applicable as a completion checklist,
-        # regardless of the Excel availability flag (which is blank there).
+        # Data Awal fields are applicable as a completion checklist unless
+        # explicitly marked as hidden (e.g. auto-populated identity fields).
         if cat == "Data Awal":
-            active = True
+            active = h not in HIDDEN_DATA_AWAL_LABELS
         else:
             active = parse_flag(flag_value, cluster)
 
