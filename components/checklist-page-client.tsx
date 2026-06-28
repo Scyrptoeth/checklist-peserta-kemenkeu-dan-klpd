@@ -2,11 +2,13 @@
 
 import { ChecklistItem } from "@/lib/data/checklist-data";
 import { useChecklistProgress } from "@/hooks/use-checklist-progress";
+import { AnonymousFeedback } from "./anonymous-feedback";
 import { ChecklistSection } from "./checklist-section";
 import { ChecklistDokumenSection } from "./checklist-dokumen-section";
 import { LinkContainer } from "./link-container";
 import { ProgressPanel } from "./progress-panel";
 import { DataAwalSection } from "./data-awal-section";
+import { SiteFooter } from "./site-footer";
 import { StickyPageHeader } from "./sticky-page-header";
 
 interface ChecklistPageClientProps {
@@ -113,6 +115,9 @@ export function ChecklistPageClient({
           </div>
         </div>
       </div>
+
+      <AnonymousFeedback />
+      <SiteFooter />
     </main>
   );
 }

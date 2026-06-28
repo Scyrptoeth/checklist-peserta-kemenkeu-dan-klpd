@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Building2, Landmark } from "lucide-react";
+import { AnonymousFeedback } from "@/components/anonymous-feedback";
+import { SiteFooter } from "@/components/site-footer";
 import { StickyPageHeader } from "@/components/sticky-page-header";
 
 export default function HomePage() {
@@ -62,6 +64,9 @@ export default function HomePage() {
           progress antar perangkat.
         </p>
       </div>
+
+      <AnonymousFeedback />
+      <SiteFooter />
     </main>
   );
 }
