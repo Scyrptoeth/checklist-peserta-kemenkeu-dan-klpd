@@ -13,7 +13,7 @@ export default function KemenkeuSelectPage() {
         backLabel="Kembali"
         breadcrumb="Kementerian Keuangan"
         title="Pilih Sub-Klaster Kemenkeu"
-        subtitle="Setiap sub-klaster memiliki variasi dokumen yang berbeda. Pilih sesuai unit kerja Anda."
+        subtitle="Setiap sub-klaster memiliki variasi dokumen yang berbeda. Pilih sesuai unit kerja Kamu."
       />
 
       <div className="mx-auto max-w-3xl px-6 py-6 sm:py-10">

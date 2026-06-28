@@ -1,171 +1,251 @@
 import { chromium } from "playwright";
+import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
-const screenshotsDir = path.join(rootDir, "public", "screenshots");
+const screenshotsDir = path.join(rootDir, "public", "guide-screenshots");
 const pdfPath = path.join(rootDir, "public", "buku-panduan.pdf");
-const baseUrl = "http://localhost:3000";
+const baseUrl = process.env.GUIDE_BASE_URL ?? "http://localhost:3000";
+const chromePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
-const sampleDataAwal = {
-  "unit-kerja": "Kantor Pelayanan Pajak Pratama",
-  "jalur": "Reguler",
-  "prodi-asal": "Diploma III Pajak",
-  "prioritas-pilihan-prodi-1": "Sarjana Terapan Akuntansi Sektor Publik",
-  "prioritas-pilihan-prodi-2": "Sarjana Terapan Manajemen Keuangan Negara",
-  "prioritas-pilihan-prodi-3": "",
-  "prioritas-pilihan-prodi-4": "",
-  "prioritas-pilihan-prodi-5": "",
-  "status-pilihan-prodi": "",
-};
+const samplePriorities = [
+  "Sarjana Terapan Akuntansi Sektor Publik",
+  "Sarjana Terapan Manajemen Keuangan Negara",
+  "Sarjana Terapan Manajemen Aset Publik",
+  "Diploma III Akuntansi",
+  "Diploma III Pajak",
+];
 
-const sampleChecked = {
-  "pasfoto-berwarna-berformat-jpg-3-bulan-terakhir-pic-peserta": true,
-  "scan-surat-keterangan-sehat-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta": true,
-  "scan-ijazah-dan-transkrip-terakhir-aslidilegalisasi-berformat-pdf-subjek-peserta": true,
-  "memenuhi-masa-kerja-minimal-pns": true,
-  "memenuhi-ketentuan-sisa-masa-kerja": true,
-  "sehat-jasmani-dan-rohani": true,
-};
+async function launchBrowser() {
+  try {
+    return await chromium.launch({
+      headless: true,
+      executablePath: chromePath,
+    });
+  } catch {
+    return chromium.launch({ headless: true });
+  }
+}
 
-async function waitForHydration(page) {
+async function prepareScreenshotsDir() {
+  await fs.rm(screenshotsDir, { recursive: true, force: true });
+  await fs.mkdir(screenshotsDir, { recursive: true });
+}
+
+async function waitForReady(page) {
   await page.waitForFunction(() => document.readyState === "complete");
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(450);
 }
 
-async function screenshot(page, name, options = {}) {
-  const filePath = path.join(screenshotsDir, name);
-  await page.screenshot({ path: filePath, fullPage: false, ...options });
-  console.log(`✓ Screenshot: ${name}`);
+async function waitForImages(page) {
+  await page.waitForFunction(() =>
+    Array.from(document.images).every((img) => img.complete && img.naturalWidth > 0)
+  );
 }
 
-async function main() {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+async function disableStickyForComponentShots(page) {
+  await page.addStyleTag({
+    content: `
+      .sticky {
+        position: static !important;
+      }
+    `,
   });
+  await page.waitForTimeout(300);
+}
 
+async function savePageScreenshot(page, filename, options = {}) {
+  const filePath = path.join(screenshotsDir, filename);
+  await page.screenshot({ path: filePath, ...options });
+  console.log(`Screenshot saved: ${filename}`);
+}
+
+async function saveLocatorScreenshot(locator, filename) {
+  const filePath = path.join(screenshotsDir, filename);
+  await locator.scrollIntoViewIfNeeded();
+  await locator.screenshot({ path: filePath });
+  console.log(`Screenshot saved: ${filename}`);
+}
+
+function sectionByHeading(page, heading) {
+  return page
+    .locator("section", {
+      has: page.getByRole("heading", { name: heading, exact: true }),
+    })
+    .first();
+}
+
+async function fillChecklistSample(page) {
+  await page.locator("#unit-kerja").selectOption({ label: "Kementerian Keuangan" });
+  await page.locator("#jalur").selectOption({ label: "Reguler" });
+  await page.locator("#prodi-asal").selectOption({ label: "Diploma I Pajak" });
+
+  for (const [index, label] of samplePriorities.entries()) {
+    await page
+      .locator(`#prioritas-pilihan-prodi-${index + 1}`)
+      .selectOption({ label });
+  }
+
+  const checkboxes = page.locator('input[type="checkbox"]');
+  const count = await checkboxes.count();
+  for (let i = 0; i < Math.min(count, 5); i += 1) {
+    await checkboxes.nth(i).check({ force: true });
+  }
+}
+
+async function gotoChecklistWithSample(page, pathName = "/checklist/klpd") {
+  await page.goto(`${baseUrl}${pathName}`, { waitUntil: "networkidle" });
+  await waitForReady(page);
+  await fillChecklistSample(page);
+  await waitForReady(page);
+}
+
+async function captureDesktopScreenshots(browser) {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 900 },
     locale: "id-ID",
     deviceScaleFactor: 2,
+    reducedMotion: "reduce",
   });
-
   const page = await context.newPage();
 
-  // 1. Landing page
   await page.goto(baseUrl, { waitUntil: "networkidle" });
-  await waitForHydration(page);
-  await screenshot(page, "01-landing.png");
+  await waitForReady(page);
+  await savePageScreenshot(page, "01-landing-full.png", { fullPage: true });
 
-  // 2. Pilih sub-klaster Kemenkeu
   await page.goto(`${baseUrl}/checklist/kemenkeu`, { waitUntil: "networkidle" });
-  await waitForHydration(page);
-  await screenshot(page, "02-pilih-subklaster.png");
+  await waitForReady(page);
+  await savePageScreenshot(page, "02-kemenkeu-subcluster-full.png", {
+    fullPage: true,
+  });
 
-  // 3. Halaman checklist DJP dengan sample data
-  const storageKey = "checklist-progress:kemenkeu:djp";
-  const storedProgress = {
-    version: 2,
-    clusterId: "kemenkeu",
-    subclusterId: "djp",
-    checked: sampleChecked,
-    dataAwal: sampleDataAwal,
-    updatedAt: new Date().toISOString(),
-  };
-
-  await page.goto(`${baseUrl}/checklist/kemenkeu/djp`, { waitUntil: "networkidle" });
-  await page.evaluate(
-    ({ key, value }) => {
-      localStorage.setItem(key, JSON.stringify(value));
-    },
-    { key: storageKey, value: storedProgress }
+  await gotoChecklistWithSample(page);
+  await disableStickyForComponentShots(page);
+  await saveLocatorScreenshot(
+    sectionByHeading(page, "Data Awal"),
+    "03-data-awal-section.png"
   );
-  await page.reload({ waitUntil: "networkidle" });
-  await waitForHydration(page);
+  await saveLocatorScreenshot(
+    sectionByHeading(page, "Checklist Dokumen"),
+    "04-dokumen-section.png"
+  );
+  await saveLocatorScreenshot(
+    sectionByHeading(page, "Checklist Non-Dokumen"),
+    "05-non-dokumen-section.png"
+  );
+  await saveLocatorScreenshot(page.locator("aside").first(), "06-progress-panel.png");
 
-  // Screenshot Data Awal
-  await page.evaluate(() => {
-    const section = document.querySelector("section");
-    if (section) section.scrollIntoView({ block: "start" });
+  await page.getByRole("button", { name: "Reset" }).click();
+  await saveLocatorScreenshot(
+    page.locator('[role="alertdialog"]').first(),
+    "08-reset-dialog.png"
+  );
+  await page.keyboard.press("Escape");
+
+  await saveLocatorScreenshot(
+    sectionByHeading(page, "Link Penting"),
+    "09-link-penting.png"
+  );
+  await saveLocatorScreenshot(
+    page.locator('section[aria-labelledby="anonymous-feedback-title"]').first(),
+    "10-feedback.png"
+  );
+  await saveLocatorScreenshot(page.locator("header").first(), "11-header.png");
+  await saveLocatorScreenshot(page.locator("footer").first(), "12-footer.png");
+
+  await context.close();
+}
+
+async function captureMobileScreenshots(browser) {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    locale: "id-ID",
+    deviceScaleFactor: 3,
+    reducedMotion: "reduce",
   });
-  await page.waitForTimeout(300);
-  await screenshot(page, "03-checklist-data-awal.png", { clip: { x: 0, y: 128, width: 1280, height: 720 } });
+  const page = await context.newPage();
 
-  // Screenshot Checklist Dokumen
-  await page.evaluate(() => {
-    const headings = Array.from(document.querySelectorAll("h2"));
-    const target = headings.find((h) => h.textContent?.includes("Checklist Dokumen"));
-    if (target) target.scrollIntoView({ block: "start" });
+  await gotoChecklistWithSample(page);
+  const expandButton = page.getByRole("button", {
+    name: /Kembangkan detail progress/i,
   });
-  await page.waitForTimeout(300);
-  await screenshot(page, "04-checklist-dokumen.png", { clip: { x: 0, y: 128, width: 1280, height: 720 } });
-
-  // Screenshot Checklist Non-Dokumen
-  await page.evaluate(() => {
-    const headings = Array.from(document.querySelectorAll("h2"));
-    const target = headings.find((h) => h.textContent?.includes("Checklist Non-Dokumen"));
-    if (target) target.scrollIntoView({ block: "start" });
+  if ((await expandButton.count()) > 0) {
+    await expandButton.first().click();
+  }
+  await page.getByRole("button", { name: "Export JSON" }).first().waitFor();
+  await page.addStyleTag({
+    content: `
+      header {
+        display: none !important;
+      }
+      .sticky {
+        position: static !important;
+      }
+      .rounded-b-2xl {
+        border-radius: 1rem !important;
+        border: 1px solid #e9ecef !important;
+        background: #ffffff !important;
+      }
+    `,
   });
-  await page.waitForTimeout(300);
-  await screenshot(page, "05-checklist-non-dokumen.png", { clip: { x: 0, y: 128, width: 1280, height: 720 } });
+  await saveLocatorScreenshot(
+    page.locator("div.rounded-b-2xl").first(),
+    "07-mobile-progress.png"
+  );
 
-  // Screenshot Link Penting
-  await page.evaluate(() => {
-    const headings = Array.from(document.querySelectorAll("h2"));
-    const target = headings.find((h) => h.textContent?.includes("Link Penting"));
-    if (target) target.scrollIntoView({ block: "start" });
+  await context.close();
+}
+
+async function generatePdf(browser) {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    locale: "id-ID",
+    deviceScaleFactor: 2,
+    reducedMotion: "reduce",
   });
-  await page.waitForTimeout(300);
-  await screenshot(page, "07-link-penting.png", { clip: { x: 0, y: 128, width: 1280, height: 720 } });
+  const page = await context.newPage();
 
-  // Screenshot Progress Panel + actions (desktop sidebar)
-  await page.evaluate(() => window.scrollTo({ top: 0 }));
-  await page.waitForTimeout(300);
-  await screenshot(page, "06-progress-panel.png", { clip: { x: 0, y: 128, width: 1280, height: 720 } });
-
-  // Screenshot Feedback Anonim
-  await page.evaluate(() => {
-    const headings = Array.from(document.querySelectorAll("h2"));
-    const target = headings.find((h) => h.textContent?.includes("Feedback anonim"));
-    if (target) target.scrollIntoView({ block: "start" });
-  });
-  await page.waitForTimeout(300);
-  await screenshot(page, "08-feedback.png", { clip: { x: 0, y: 0, width: 1280, height: 520 } });
-
-  // Screenshot Promo header
-  await page.goto(`${baseUrl}/checklist/kemenkeu/djp`, { waitUntil: "networkidle" });
-  await waitForHydration(page);
-  await screenshot(page, "09-promo.png", { clip: { x: 320, y: 0, width: 640, height: 128 } });
-
-  // 4. Generate PDF dari halaman /buku-panduan
   await page.goto(`${baseUrl}/buku-panduan`, { waitUntil: "networkidle" });
-  await waitForHydration(page);
-  // Scroll ke bawah agar gambar lazy-load terpicu
+  await waitForReady(page);
   await page.evaluate(async () => {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    for (let i = 0; i < 10; i++) {
-      window.scrollBy(0, window.innerHeight);
-      await delay(200);
+    window.scrollTo({ top: 0 });
+    for (let y = 0; y < document.body.scrollHeight; y += window.innerHeight) {
+      window.scrollTo({ top: y });
+      await delay(120);
     }
     window.scrollTo({ top: 0 });
   });
-  await page.waitForTimeout(1000);
+  await waitForImages(page);
+  await waitForReady(page);
 
   await page.pdf({
     path: pdfPath,
     format: "A4",
     printBackground: true,
-    margin: { top: "1.5cm", right: "1.5cm", bottom: "1.5cm", left: "1.5cm" },
-    preferCSSPageSize: false,
+    margin: { top: "1.4cm", right: "1.4cm", bottom: "1.4cm", left: "1.4cm" },
   });
-  console.log(`✓ PDF generated: ${pdfPath}`);
+  console.log(`PDF generated: ${pdfPath}`);
 
-  await browser.close();
+  await context.close();
 }
 
-main().catch((err) => {
-  console.error(err);
+async function main() {
+  await prepareScreenshotsDir();
+  const browser = await launchBrowser();
+  try {
+    await captureDesktopScreenshots(browser);
+    await captureMobileScreenshots(browser);
+    await generatePdf(browser);
+  } finally {
+    await browser.close();
+  }
+}
+
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

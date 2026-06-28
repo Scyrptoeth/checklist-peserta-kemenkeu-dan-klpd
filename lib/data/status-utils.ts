@@ -12,7 +12,7 @@ export function computeProdiStatus(
   const count = filled.length;
 
   if (count > avail) {
-    return `Seluruh pilihan telah dipilih, anda memilih lebih dari kemungkinan pilihan yang tersedia, periksa pilihan anda (${count}/${avail})`;
+    return `Seluruh pilihan telah dipilih, Kamu memilih lebih dari kemungkinan pilihan yang tersedia, periksa pilihan Kamu (${count}/${avail})`;
   }
 
   if (count === avail) {

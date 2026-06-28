@@ -11,7 +11,7 @@ export default function NotFoundPage() {
       <h1 className="text-6xl font-bold tracking-tight text-ink-300">404</h1>
       <h2 className="mt-4 text-2xl font-semibold text-ink-950">Halaman tidak ditemukan</h2>
       <p className="mt-2 max-w-md text-ink-600">
-        Tautan yang Anda tuju tidak tersedia. Kembali ke beranda untuk memilih checklist.
+        Tautan yang Kamu tuju tidak tersedia. Kembali ke beranda untuk memilih checklist.
       </p>
       <Link
         href="/"

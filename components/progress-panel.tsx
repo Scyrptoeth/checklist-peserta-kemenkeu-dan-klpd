@@ -98,7 +98,7 @@ export function ProgressPanel({
           Hapus semua progress?
         </h3>
         <p id="reset-desc" className="mt-2 text-sm leading-relaxed text-ink-600">
-          Semua centangan dan data yang telah diisi akan dikosongkan. Pastikan Anda sudah mengekspor data jika perlu.
+          Semua centangan dan data yang telah diisi akan dikosongkan. Pastikan Kamu sudah mengekspor data jika perlu.
         </p>
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button

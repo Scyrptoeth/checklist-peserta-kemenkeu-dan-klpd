@@ -30,7 +30,7 @@ export function DeveloperLoginForm() {
 
       window.location.reload();
     } catch {
-      setError("Login gagal. Periksa koneksi internet Anda.");
+      setError("Login gagal. Periksa koneksi internet Kamu.");
     } finally {
       setIsLoading(false);
     }
