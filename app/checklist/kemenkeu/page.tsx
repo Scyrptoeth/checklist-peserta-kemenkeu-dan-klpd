@@ -1,27 +1,20 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { kemenkeuClusters } from "@/lib/data/checklist-data";
+import { StickyPageHeader } from "@/components/sticky-page-header";
 
 export default function KemenkeuSelectPage() {
   return (
     <main className="min-h-dvh bg-ink-50">
-      <div className="mx-auto max-w-3xl px-6 py-12 sm:py-20">
-        <Link
-          href="/"
-          className="mb-8 inline-flex items-center gap-1.5 text-sm font-medium text-ink-600 transition-colors hover:text-brand-700"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Kembali
-        </Link>
+      <StickyPageHeader
+        backHref="/"
+        backLabel="Kembali"
+        breadcrumb="Kementerian Keuangan"
+        title="Pilih Sub-Klaster Kemenkeu"
+        subtitle="Setiap sub-klaster memiliki variasi dokumen yang berbeda. Pilih sesuai unit kerja Anda."
+      />
 
-        <div className="mb-10">
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-ink-950 sm:text-4xl">
-            Pilih Sub-Klaster Kemenkeu
-          </h1>
-          <p className="mt-3 text-balance text-ink-700">
-            Setiap sub-klaster memiliki variasi dokumen yang berbeda. Pilih sesuai unit kerja Anda.
-          </p>
-        </div>
+      <div className="mx-auto max-w-3xl px-6 py-6 sm:py-10">
 
         <div className="grid gap-4 sm:grid-cols-2">
           {kemenkeuClusters.map((cluster) => (

@@ -34,7 +34,7 @@ export function ChecklistSection({
     <section className="rounded-2xl border border-ink-200 bg-white shadow-sm">
       <div
         className={cn(
-          "sticky top-0 z-30 rounded-t-2xl border-b bg-white/95 px-5 py-5 backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:px-6",
+          "sticky top-24 z-30 rounded-t-2xl border-b bg-white/95 px-5 py-5 backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:px-6",
           stats.percent === 100 ? "border-emerald-100" : "border-ink-100"
         )}
       >

@@ -1,20 +1,25 @@
 import Link from "next/link";
 import { ArrowRight, Building2, Landmark } from "lucide-react";
+import { StickyPageHeader } from "@/components/sticky-page-header";
 
 export default function HomePage() {
   return (
     <main className="min-h-dvh bg-ink-50">
-      <div className="mx-auto max-w-3xl px-6 py-16 sm:py-24">
+      <StickyPageHeader
+        title="Checklist Peserta"
+        subtitle="Pastikan seluruh persyaratan dokumen dan non-dokumen telah terpenuhi sebelum mendaftar."
+      />
+
+      <div className="mx-auto max-w-3xl px-6 py-10 sm:py-16">
         <div className="mb-12 text-center">
           <span className="mb-4 inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-800">
             SPMB PT PKN STAN 2026
           </span>
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-ink-950 sm:text-5xl">
-            Checklist Peserta
-          </h1>
+          <h2 className="text-balance text-3xl font-bold tracking-tight text-ink-950 sm:text-5xl">
+            Pilih Klaster
+          </h2>
           <p className="mt-4 text-balance text-lg text-ink-700">
-            Pastikan seluruh persyaratan dokumen dan non-dokumen telah terpenuhi sebelum
-            mendaftar.
+            Kemenkeu atau KLPD — pilih sesuai asal instansi Anda.
           </p>
         </div>
 

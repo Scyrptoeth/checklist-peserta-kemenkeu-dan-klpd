@@ -19,6 +19,27 @@ HIDDEN_DATA_AWAL_LABELS = {
 
 JALUR_OPTIONS = ["Reguler", "Afirmasi"]
 
+# Additional KLPD dokumen items that are not present in the Excel prototype but are
+# required for KLPD participants. Injected before the "Link" column on regeneration.
+KLPD_EXTRA_DOKUMEN_ITEMS = [
+    {
+        "id": "surat-rekomendasi-kepala-unit-kerja-tte-atau-tanda-tangan-basah-dan-stemple-berformat-pdf-pic-unit-kerja",
+        "label": "Surat Rekomendasi Kepala Unit Kerja (TTE atau Tanda Tangan Basah dan Stemple) Berformat PDF (Subjek: Unit Kerja)",
+        "category": "Checklist Dokumen",
+        "applies": True,
+        "rawFlag": "Wajib untuk Semua Unit Kerja",
+        "subject": "Subjek: Unit Kerja",
+    },
+    {
+        "id": "nota-dinas-usulan-pendaftar-spmb-tb-tte-atau-tanda-tangan-basah-dan-stempel-berformat-pdf-subjek-unit-kerja",
+        "label": "Nota Dinas Usulan Pendaftar SPMB TB (TTE atau Tanda Tangan Basah dan Stempel) Berformat PDF (Subjek: Unit Kerja)",
+        "category": "Checklist Dokumen",
+        "applies": True,
+        "rawFlag": "Wajib untuk Semua Unit Kerja",
+        "subject": "Subjek: Unit Kerja",
+    },
+]
+
 
 def slugify(text: str) -> str:
     text = re.sub(r"[^\w\s-]", "", text).strip().lower()
@@ -232,6 +253,13 @@ def build_data():
         kemenkeu_checklists[cluster["id"]] = [decorate_data_awal(item, True, ref) for item in items]
 
     klpd_items = extract_checklist(klpd_path, "checklistPesertaKlpd", None)
+
+    # Inject additional KLPD Unit Kerja dokumen items before the Link column.
+    for i, item in enumerate(klpd_items):
+        if item["category"] == "Link Penting":
+            klpd_items[i:i] = KLPD_EXTRA_DOKUMEN_ITEMS
+            break
+
     klpd_items = [decorate_data_awal(item, False, ref) for item in klpd_items]
 
     return {
