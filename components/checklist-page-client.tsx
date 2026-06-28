@@ -10,6 +10,7 @@ import { ProgressPanel } from "./progress-panel";
 import { DataAwalSection } from "./data-awal-section";
 import { SiteFooter } from "./site-footer";
 import { StickyPageHeader } from "./sticky-page-header";
+import { PromoBanner } from "./promo-banner";
 import { ExternalLink } from "lucide-react";
 
 interface ChecklistPageClientProps {
@@ -171,9 +172,11 @@ export function ChecklistPageClient({
         subtitle="Lengkapi Data Awal, lalu centang setiap persyaratan yang sudah terpenuhi. Progress tersimpan otomatis di perangkat ini."
       />
 
+      <PromoBanner />
+
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
         {/* Mobile sticky top progress summary */}
-        <div className="sticky top-24 z-40 -mx-4 mb-6 px-4 sm:-mx-6 sm:px-6 lg:hidden">
+        <div className="sticky top-28 z-30 -mx-4 mb-6 px-4 sm:-mx-6 sm:px-6 lg:hidden">
           <ProgressPanel
             variant="compact"
             stats={stats}
