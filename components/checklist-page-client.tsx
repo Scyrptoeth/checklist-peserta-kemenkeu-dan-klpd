@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, RotateCcw } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { ChecklistItem } from "@/lib/data/checklist-data";
 import { useChecklistProgress } from "@/hooks/use-checklist-progress";
 import { ChecklistSection } from "./checklist-section";
 import { LinkContainer } from "./link-container";
-import { ProgressBar } from "./progress-bar";
-import { ImportExport } from "./import-export";
+import { ProgressPanel } from "./progress-panel";
+import { DataAwalSection } from "./data-awal-section";
 
 interface ChecklistPageClientProps {
   clusterId: string;
@@ -26,8 +26,10 @@ export function ChecklistPageClient({
 }: ChecklistPageClientProps) {
   const {
     checked,
+    dataAwal,
     toggle,
     reset,
+    setDataAwal,
     stats,
     exportJson,
     importJson,
@@ -48,8 +50,8 @@ export function ChecklistPageClient({
 
   return (
     <main className="min-h-dvh bg-ink-50 pb-20">
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
+        <div className="mb-6">
           <Link
             href={clusterId === "klpd" ? "/" : "/checklist/kemenkeu"}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-600 transition-colors hover:text-brand-700"
@@ -57,7 +59,6 @@ export function ChecklistPageClient({
             <ArrowLeft className="h-4 w-4" />
             Kembali
           </Link>
-          <ImportExport onExport={exportJson} onImport={importJson} />
         </div>
 
         <div className="mb-8">
@@ -66,61 +67,65 @@ export function ChecklistPageClient({
             {subclusterLabel ?? "Checklist"}
           </h1>
           <p className="mt-2 text-balance text-ink-700">
-            Centang setiap persyaratan yang sudah terpenuhi. Progress tersimpan otomatis di
-            perangkat ini.
+            Lengkapi Data Awal, lalu centang setiap persyaratan yang sudah
+            terpenuhi. Progress tersimpan otomatis di perangkat ini.
           </p>
         </div>
 
-        <div className="mb-8 rounded-2xl border border-ink-200 bg-white p-5 shadow-sm sm:p-6">
-          <ProgressBar
-            percent={stats.overall.percent}
-            label="Progress Keseluruhan"
-            sublabel={`${stats.overall.done} dari ${stats.overall.total} persyaratan terpenuhi`}
+        {/* Mobile sticky top progress summary */}
+        <div className="sticky top-0 z-40 -mx-4 mb-6 px-4 sm:-mx-6 sm:px-6 lg:hidden">
+          <ProgressPanel
+            variant="compact"
+            stats={stats}
+            onExport={exportJson}
+            onImport={importJson}
+            onReset={reset}
           />
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            <ProgressBar percent={stats.dataAwal.percent} label="Data Awal" size="sm" />
-            <ProgressBar percent={stats.nonDokumen.percent} label="Non-Dokumen" size="sm" />
-            <ProgressBar percent={stats.dokumen.percent} label="Dokumen" size="sm" />
+        </div>
+
+        <div className="flex flex-col gap-8 lg:flex-row">
+          {/* Desktop sticky left sidebar */}
+          <div className="hidden lg:block lg:w-80 lg:shrink-0 xl:w-96">
+            <div className="sticky top-6">
+              <ProgressPanel
+                variant="full"
+                stats={stats}
+                onExport={exportJson}
+                onImport={importJson}
+                onReset={reset}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-6">
-          <ChecklistSection
-            title="Data Awal"
-            category="Informasi dasar Calon Peserta"
-            items={dataAwalItems}
-            checked={checked}
-            onToggle={toggle}
-            stats={stats.dataAwal}
-          />
-          <ChecklistSection
-            title="Checklist Non-Dokumen"
-            category="Kesesuaian persyaratan kepegawaian"
-            items={nonDokumenItems}
-            checked={checked}
-            onToggle={toggle}
-            stats={stats.nonDokumen}
-          />
-          <ChecklistSection
-            title="Checklist Dokumen"
-            category="Kelengkapan dokumen administrasi"
-            items={dokumenItems}
-            checked={checked}
-            onToggle={toggle}
-            stats={stats.dokumen}
-          />
-          <LinkContainer links={linkItems} />
-        </div>
-
-        <div className="mt-10 flex justify-center">
-          <button
-            type="button"
-            onClick={reset}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reset Progress
-          </button>
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col gap-6">
+              <DataAwalSection
+                items={dataAwalItems}
+                values={dataAwal}
+                onChange={setDataAwal}
+                statusText={stats.dataAwal.statusText ?? ""}
+                statusDone={stats.dataAwal.statusDone ?? false}
+              />
+              <ChecklistSection
+                title="Checklist Non-Dokumen"
+                category="Kesesuaian persyaratan kepegawaian"
+                items={nonDokumenItems}
+                checked={checked}
+                onToggle={toggle}
+                stats={stats.nonDokumen}
+              />
+              <ChecklistSection
+                title="Checklist Dokumen"
+                category="Kelengkapan dokumen administrasi"
+                items={dokumenItems}
+                checked={checked}
+                onToggle={toggle}
+                stats={stats.dokumen}
+              />
+              <LinkContainer links={linkItems} />
+            </div>
+          </div>
         </div>
       </div>
     </main>

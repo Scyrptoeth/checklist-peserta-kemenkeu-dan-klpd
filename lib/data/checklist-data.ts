@@ -9,6 +9,8 @@ export type ChecklistCategory =
 
 export type ClusterId = 'kemenkeu' | 'klpd';
 
+export type DataAwalFieldType = "text" | "select" | "computed";
+
 export interface ChecklistItem {
   id: string;
   label: string;
@@ -16,6 +18,17 @@ export interface ChecklistItem {
   applies: boolean;
   link?: string;
   rawFlag?: string;
+  fieldType?: DataAwalFieldType;
+  options?: string[];
+  dependsOn?: string;
+}
+
+export interface DataAwalField extends ChecklistItem {
+  fieldType: DataAwalFieldType;
+}
+
+export function isDataAwalField(item: ChecklistItem): item is DataAwalField {
+  return typeof item.fieldType === "string";
 }
 
 export interface Cluster {
@@ -33,21 +46,21 @@ export const kemenkeuClusters: Cluster[] = [
 
 export const kemenkeuChecklists: Record<string, ChecklistItem[]> = {
   "djbc": [
-    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "text" },
     { id: "unitsatuan-kerja", label: "Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "nama-pic-unitsatuan-kerja", label: "Nama PIC Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Reguler", "Afirmasi"] },
     { id: "nip", label: "NIP", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "nama", label: "NAMA", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "email", label: "EMAIL", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "id-instansi", label: "ID INSTANSI", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Diploma III Akuntansi", "Diploma III Akuntansi Pemerintah", "Diploma III Kebendaharaan Negara", "Diploma III Anggaran", "Diploma III Pajak", "Diploma III Perpajakan", "Diploma III Kepabeanan dan Cukai", "Diploma III Bea dan Cukai", "Diploma III PBB/Penilai", "Diploma III Pengurusan Piutang dan Lelang Negara", "Diploma III Manajemen Aset", "Diploma I Pajak", "Diploma I Perpajakan", "Diploma I Administrasi Perpajakan", "Diploma I Kepabeanan dan Cukai", "Diploma I Bea dan Cukai", "Diploma I Lainnya"] },
+    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "computed" },
+    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
     { id: "kesesuaian-antara-pendidikan-awal-dengan-prodi-tujuan", label: "Kesesuaian antara Pendidikan Awal dengan Prodi Tujuan", category: "Checklist Non-Dokumen", applies: false, link: "", rawFlag: "" },
     { id: "memenuhi-masa-kerja-minimal-pns", label: "Memenuhi Masa Kerja Minimal PNS", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
     { id: "memenuhi-ketentuan-sisa-masa-kerja", label: "Memenuhi Ketentuan Sisa Masa Kerja", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
@@ -84,21 +97,21 @@ export const kemenkeuChecklists: Record<string, ChecklistItem[]> = {
     { id: "link-penting", label: "Link Penting", category: "Link Penting", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
   ],
   "djp": [
-    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "text" },
     { id: "unitsatuan-kerja", label: "Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "nama-pic-unitsatuan-kerja", label: "Nama PIC Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Reguler", "Afirmasi"] },
     { id: "nip", label: "NIP", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "nama", label: "NAMA", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "email", label: "EMAIL", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "id-instansi", label: "ID INSTANSI", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Diploma III Akuntansi", "Diploma III Akuntansi Pemerintah", "Diploma III Kebendaharaan Negara", "Diploma III Anggaran", "Diploma III Pajak", "Diploma III Perpajakan", "Diploma III Kepabeanan dan Cukai", "Diploma III Bea dan Cukai", "Diploma III PBB/Penilai", "Diploma III Pengurusan Piutang dan Lelang Negara", "Diploma III Manajemen Aset", "Diploma I Pajak", "Diploma I Perpajakan", "Diploma I Administrasi Perpajakan", "Diploma I Kepabeanan dan Cukai", "Diploma I Bea dan Cukai", "Diploma I Lainnya"] },
+    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "computed" },
+    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
     { id: "kesesuaian-antara-pendidikan-awal-dengan-prodi-tujuan", label: "Kesesuaian antara Pendidikan Awal dengan Prodi Tujuan", category: "Checklist Non-Dokumen", applies: false, link: "", rawFlag: "" },
     { id: "memenuhi-masa-kerja-minimal-pns", label: "Memenuhi Masa Kerja Minimal PNS", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
     { id: "memenuhi-ketentuan-sisa-masa-kerja", label: "Memenuhi Ketentuan Sisa Masa Kerja", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
@@ -135,21 +148,21 @@ export const kemenkeuChecklists: Record<string, ChecklistItem[]> = {
     { id: "link-penting", label: "Link Penting", category: "Link Penting", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
   ],
   "djpb": [
-    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "text" },
     { id: "unitsatuan-kerja", label: "Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "nama-pic-unitsatuan-kerja", label: "Nama PIC Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Reguler", "Afirmasi"] },
     { id: "nip", label: "NIP", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "nama", label: "NAMA", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "email", label: "EMAIL", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "id-instansi", label: "ID INSTANSI", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Diploma III Akuntansi", "Diploma III Akuntansi Pemerintah", "Diploma III Kebendaharaan Negara", "Diploma III Anggaran", "Diploma III Pajak", "Diploma III Perpajakan", "Diploma III Kepabeanan dan Cukai", "Diploma III Bea dan Cukai", "Diploma III PBB/Penilai", "Diploma III Pengurusan Piutang dan Lelang Negara", "Diploma III Manajemen Aset", "Diploma I Pajak", "Diploma I Perpajakan", "Diploma I Administrasi Perpajakan", "Diploma I Kepabeanan dan Cukai", "Diploma I Bea dan Cukai", "Diploma I Lainnya"] },
+    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "computed" },
+    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
     { id: "kesesuaian-antara-pendidikan-awal-dengan-prodi-tujuan", label: "Kesesuaian antara Pendidikan Awal dengan Prodi Tujuan", category: "Checklist Non-Dokumen", applies: false, link: "", rawFlag: "" },
     { id: "memenuhi-masa-kerja-minimal-pns", label: "Memenuhi Masa Kerja Minimal PNS", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
     { id: "memenuhi-ketentuan-sisa-masa-kerja", label: "Memenuhi Ketentuan Sisa Masa Kerja", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
@@ -186,21 +199,21 @@ export const kemenkeuChecklists: Record<string, ChecklistItem[]> = {
     { id: "link-penting", label: "Link Penting", category: "Link Penting", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
   ],
   "ue-1": [
-    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "text" },
     { id: "unitsatuan-kerja", label: "Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "nama-pic-unitsatuan-kerja", label: "Nama PIC Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Reguler", "Afirmasi"] },
     { id: "nip", label: "NIP", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "nama", label: "NAMA", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "email", label: "EMAIL", category: "Data Awal", applies: false, link: "", rawFlag: "" },
     { id: "id-instansi", label: "ID INSTANSI", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "" },
+    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Diploma III Akuntansi", "Diploma III Akuntansi Pemerintah", "Diploma III Kebendaharaan Negara", "Diploma III Anggaran", "Diploma III Pajak", "Diploma III Perpajakan", "Diploma III Kepabeanan dan Cukai", "Diploma III Bea dan Cukai", "Diploma III PBB/Penilai", "Diploma III Pengurusan Piutang dan Lelang Negara", "Diploma III Manajemen Aset", "Diploma I Pajak", "Diploma I Perpajakan", "Diploma I Administrasi Perpajakan", "Diploma I Kepabeanan dan Cukai", "Diploma I Bea dan Cukai", "Diploma I Lainnya"] },
+    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "computed" },
+    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
     { id: "kesesuaian-antara-pendidikan-awal-dengan-prodi-tujuan", label: "Kesesuaian antara Pendidikan Awal dengan Prodi Tujuan", category: "Checklist Non-Dokumen", applies: false, link: "", rawFlag: "" },
     { id: "memenuhi-masa-kerja-minimal-pns", label: "Memenuhi Masa Kerja Minimal PNS", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
     { id: "memenuhi-ketentuan-sisa-masa-kerja", label: "Memenuhi Ketentuan Sisa Masa Kerja", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
@@ -241,32 +254,32 @@ export const kemenkeuChecklists: Record<string, ChecklistItem[]> = {
 export const klpdCluster: Cluster = { id: "klpd", label: "KLPD", full: "Kementerian/Lembaga/Pemerintah Daerah" };
 
 export const klpdChecklist: ChecklistItem[] = [
-  { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "nama-pic-unitsatuan-kerja", label: "Nama PIC Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-  { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "nip", label: "NIP", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-  { id: "nama", label: "NAMA", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-  { id: "email", label: "EMAIL", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-  { id: "id-instansi", label: "ID INSTANSI", category: "Data Awal", applies: false, link: "", rawFlag: "" },
-  { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "" },
-  { id: "kesesuaian-antara-pendidikan-awal-dengan-prodi-tujuan", label: "Kesesuaian antara Pendidikan Awal dengan Prodi Tujuan", category: "Checklist Non-Dokumen", applies: false, link: "", rawFlag: "" },
-  { id: "pendaftar-tidak-pernah-dibatalkandihentikan-tugas-belajarnya-sesuai-dengan-ketentuan-peraturan-perundang-undangan-dalam-waktu-dua-tahun-terakhir-terhitung-mundur-dari-tanggal-pengumuman-spmb-pt-pkn-stan-tahun-2026", label: "Pendaftar tidak pernah dibatalkan/dihentikan tugas belajarnya sesuai dengan ketentuan peraturan perundang-undangan dalam waktu dua tahun terakhir terhitung mundur dari tanggal Pengumuman SPMB-PT PKN STAN Tahun 2026", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "memenuhi-persyaratan-sesuai-dengan-ketentuan-kepegawaiantugas-belajar-yang-berlaku-di-klpd", label: "Memenuhi persyaratan sesuai dengan ketentuan kepegawaian/tugas belajar yang berlaku di KLPD", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "diusulkan-oleh-pejabat-pimpinan-tinggi-utamamadyapratama-yang-berwenang-di-bidang-kepegawaian", label: "Diusulkan oleh Pejabat Pimpinan Tinggi Utama/Madya/Pratama yang berwenang di bidang kepegawaian", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "pasfoto-berwarna-berformat-jpg-3-bulan-terakhir-pic-peserta", label: "Pasfoto Berwarna Berformat .jpg (3 Bulan Terakhir) (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "scan-surat-keterangan-sehat-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta", label: "Scan Surat Keterangan Sehat dari Rumah Sakit Pemerintah Berformat PDF (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "scan-surat-keterangan-kesehatan-jiwa-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta", label: "Scan Surat Keterangan Kesehatan Jiwa dari Rumah Sakit Pemerintah Berformat PDF (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "scan-surat-keterangan-bebas-tbc-hepatitis-dan-hivaids-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta", label: "Scan Surat Keterangan Bebas TBC, Hepatitis, dan HIV/AIDS dari Rumah Sakit Pemerintah Berformat PDF (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "scan-surat-keterangan-bebas-napza-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta", label: "Scan Surat Keterangan Bebas NAPZA dari Rumah Sakit Pemerintah Berformat PDF (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "surat-pernyataan-memenuhi-persyaratan-tb-dan-belum-pernah-diberhentikan-mengundurkan-diri-dari-tb-sebelumnya-tte-dan-e-materai-atau-tanda-tangan-basah-dan-materai-tempel-berformat-pdf-subjek-peserta", label: "Surat Pernyataan Memenuhi Persyaratan TB dan Belum Pernah Diberhentikan/ Mengundurkan Diri dari TB Sebelumnya ((TTE dan e-Materai) atau (Tanda Tangan Basah dan Materai Tempel) Berformat PDF (Subjek: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "surat-pernyataan-tentang-pemilihan-dan-persetujuan-alokasi-program-studi-tte-atau-tanda-tangan-basah-berformat-pdf-subjek-peserta-dan-unit-kerja", label: "Surat Pernyataan tentang Pemilihan dan Persetujuan Alokasi Program Studi (TTE atau Tanda Tangan Basah) Berformat PDF (Subjek: Peserta dan Unit Kerja)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
-  { id: "link", label: "Link", category: "Link Penting", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "unit-kerja", label: "Unit Kerja", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Arsip Nasional Republik Indonesia", "Badan Informasi Geospasial", "Badan Intelijen Negara", "Badan Keamanan Laut", "Badan Kepegawaian Negara", "Badan Kependudukan dan Keluarga Berencana Nasional", "Badan Meteorologi, Klimatologi, dan Geofisika", "Badan Narkotika Nasional", "Badan Nasional Penanggulangan Bencana", "Badan Nasional Penanggulangan Terorisme", "Badan Nasional Pencarian dan Pertolongan", "Badan Pelindungan Pekerja Migran Indonesia", "Badan Pembinaan Ideologi Pancasila", "Badan Pemeriksa Keuangan", "Badan Pengawas Obat dan Makanan", "Badan Pengawas Pemilihan Umum", "Badan Pengawas Tenaga Nuklir", "Badan Pengawasan Keuangan dan Pembangunan", "Badan Pusat Statistik", "Badan Siber dan Sandi Negara", "Badan Standardisasi Nasional", "Kejaksaan Agung", "Kementerian Agraria dan Tata Ruang/Badan Pertahanan Nasional", "Kementerian BUMN", "Kementerian Dalam Negeri", "Kementerian Desa, PDT, dan Transmigrasi", "Kementerian Energi dan Sumber Daya Mineral", "Kementerian HAM", "Kementerian Investasi/BKPM", "Kementerian Kelautan dan Perikanan", "Kementerian Keuangan", "Kementerian Kesehatan", "Kementerian Ketenagakerjaan", "Kementerian Komunikasi dan Digital", "Kementerian Koordinator Bidang Pembangunan Manusia dan Kebudayaan", "Kementerian Koordinator Bidang Perekonomian", "Kementerian UMKM", "Kementerian PAN-RB", "Kementerian Pekerjaan Umum", "Kementerian Pemberdayaan Perempuan dan Perlindungan Anak", "Kementerian Pemuda dan Olahraga", "Kementerian Perdagangan", "Kementerian Perhubungan", "Kementerian Perindustrian", "Kementerian Pertahanan", "Kementerian PPN/Bappenas", "Kementerian Sekretariat Negara", "Kementerian Sosial", "Kepolisian Negara Republik Indonesia", "Komisi Pemberantasan Korupsi", "Komisi Pemilihan Umum", "Komite Aparatur Sipil Negara", "Komnas HAM", "Lembaga Administrasi Negara", "Lembaga Kebijakan Pengadaan Barang/Jasa Pemerintah", "Lembaga Ketahanan Nasional", "Lembaga Perlindungan Saksi dan Korban", "Mahkamah Agung", "Ombudsman", "Pemerintah Kabupaten Badung", "Pemerintah Kabupaten Bandung", "Pemerintah Kabupaten Banjarnegara", "Pemerintah Kabupaten Bantul", "Pemerintah Kabupaten Batu Bara", "Pemerintah Kabupaten Berau", "Pemerintah Kabupaten Blitar", "Pemerintah Kabupaten Bogor", "Pemerintah Kabupaten Bojonegoro", "Pemerintah Kabupaten Boyolali", "Pemerintah Kabupaten Demak", "Pemerintah Kabupaten Garut", "Pemerintah Kabupaten Gianyar", "Pemerintah Kabupaten Gresik", "Pemerintah Kabupaten Indragiri Hulu", "Pemerintah Kabupaten Jombang", "Pemerintah Kabupaten Kediri", "Pemerintah Kabupaten Klungkung", "Pemerintah Kabupaten Kulon Progo", "Pemerintah Kabupaten Kutai Barat", "Pemerintah Kabupaten Kutai Kartanegara", "Pemerintah Kabupaten Lamongan", "Pemerintah Kabupaten Lebak", "Pemerintah Kabupaten Lumajang", "Pemerintah Kabupaten Madiun", "Pemerintah Kabupaten Mahakam Ulu", "Pemerintah Kabupaten Malang", "Pemerintah Kabupaten Muara Enim", "Pemerintah Kabupaten Musi Banyuasin", "Pemerintah Kabupaten Musi Rawas", "Pemerintah Kabupaten Ngawi", "Pemerintah Kabupaten Ogan Komering Ilir", "Pemerintah Kabupaten Pacitan", "Pemerintah Kabupaten Pasuruan", "Pemerintah Kabupaten Pati", "Pemerintah Kabupaten Penukal Abab Lematang Ilir", "Pemerintah Kabupaten Ponorogo", "Pemerintah Kabupaten Probolinggo", "Pemerintah Kabupaten Purwakarta", "Pemerintah Kabupaten Purworejo", "Pemerintah Kabupaten Sampang", "Pemerintah Kabupaten Sarolangun", "Pemerintah Kabupaten Semarang", "Pemerintah Kabupaten Serang", "Pemerintah Kabupaten Sidoarjo", "Pemerintah Kabupaten Sleman", "Pemerintah Kabupaten Sukabumi", "Pemerintah Kabupaten Tabalong", "Pemerintah Kabupaten Tangerang", "Pemerintah Kabupaten Temanggung", "Pemerintah Kabupaten Trenggalek", "Pemerintah Kabupaten Tulungagung", "Pemerintah Kabupaten Wonosobo", "Pemerintah Kota Balikpapan", "Pemerintah Kota Bandung", "Pemerintah Kota Bekasi", "Pemerintah Kota Blitar", "Pemerintah Kota Bogor", "Pemerintah Kota Bontang", "Pemerintah Kota Cirebon", "Pemerintah Kota Denpasar", "Pemerintah Kota Depok", "Pemerintah Kota Jambi", "Pemerintah Kota Malang", "Pemerintah Kota Mojokerto", "Pemerintah Kota Palembang", "Pemerintah Kota Pasuruan", "Pemerintah Kota Pontianak", "Pemerintah Kota Probolinggo", "Pemerintah Kota Samarinda", "Pemerintah Kota Semarang", "Pemerintah Kota Surakarta", "Pemerintah Kota Tangerang", "Pemerintah Kota Tangerang Selatan", "Pemerintah Kota Yogyakarta", "Pemerintah Provinsi Aceh", "Pemerintah Provinsi Bali", "Pemerintah Provinsi Banten", "Pemerintah Provinsi Daerah Istimewa Yogyakarta", "Pemerintah Provinsi Jambi", "Pemerintah Provinsi Jawa Barat", "Pemerintah Provinsi Jawa Tengah", "Pemerintah Provinsi Jawa Timur", "Pemerintah Provinsi Kalimantan Barat", "Pemerintah Provinsi Kalimantan Selatan", "Pemerintah Provinsi Kalimantan Timur", "Pemerintah Provinsi Kepulauan Bangka Belitung", "Pemerintah Provinsi Riau", "Pemerintah Provinsi Sulawesi Utara", "Pemerintah Provinsi Sumatera Selatan", "Pusat Pelaporan dan Analisis Transaksi Keuangan", "Sekretariat Jenderal Dewan Perwakilan Daerah", "Sekretariat Jenderal DPR", "Sekretariat Jenderal Komisi Yudisial", "Sekretariat Jenderal Mahkamah Konstitusi", "Kementerian Koordinator Bidang Infrastruktur dan Pembangunan Wilayah", "Kementerian Lingkungan Hidup", "Kementerian Kehutanan", "Kementerian Pariwisata", "Kementerian Ekonomi Kreatif / Kepala BEKRAF", "Kementerian Pendidikan Dasar dan Menengah", "Kementerian Pendidikan Tinggi, Sains, dan Teknologi", "Kementerian Kebudayaan", "Kementerian Hukum", "Kementerian Imigrasi dan Pemasyarakatan", "Kementerian Kependudukan dan Perlindungan Keluarga (BKKBN)", "Kementerian Koordinator Bidang Ketahanan Pangan", "Kementerian Koordinator Bidang Pemberdayaan Sosial", "Kementerian Perlindungan Pekerja Migran Indonesia (BP2MI)", "Badan Pengkajian dan Penerapan Teknologi", "Badan Tenaga Nuklir Nasional", "Kementerian Agraria dan Tata Ruang / Badan Pertanahan Nasional", "Kementerian Desa, Pembangunan Daerah Tertinggal dan Transmigrasi", "Kementerian Hukum dan Hak Asasi Manusia", "Kementerian Investasi/ Badan Koordinasi Penanaman Modal", "Kementerian Komunikasi dan Informatika", "Kementerian Koordinator Bidang Kemaritiman dan Investasi", "Kementerian Koperasi dan Usaha Kecil dan Menengah", "Kementerian Lingkungan Hidup Dan Kehutanan", "Kementerian Pariwisata dan Ekonomi Kreatif/ Badan Pariwisata dan Ekonomi Kreatif", "Kementerian Pekerjaan Umum dan Perumahan Rakyat", "Kementerian Pendayagunaan Aparatur Negara Dan Reformasi Birokrasi", "Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi", "Kementerian Perencanaan Pembangunan Nasional/BAPPENAS", "Kepolisian Republik Indonesia", "Komisi Aparatur Sipil Negara", "Komisi Nasional Hak Asasi Manusia", "Pemerintah Daerah Daerah Istimewa Yogyakarta", "Pemerintah Kabupaten Banyuwangi", "Pemerintah Kabupaten Brebes", "Pemerintah Kabupaten Bungo", "Pemerintah Kabupaten Cirebon", "Pemerintah Kabupaten Jember", "Pemerintah Kabupaten Karangasem", "Pemerintah Kabupaten Sumedang", "Pemerintah Kota Tasikmalaya", "Lainnya"] },
+    { id: "nama-pic-unitsatuan-kerja", label: "Nama PIC Unit/Satuan Kerja", category: "Data Awal", applies: false, link: "", rawFlag: "" },
+    { id: "jalur", label: "JALUR", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Reguler", "Afirmasi"] },
+    { id: "nip", label: "NIP", category: "Data Awal", applies: false, link: "", rawFlag: "" },
+    { id: "nama", label: "NAMA", category: "Data Awal", applies: false, link: "", rawFlag: "" },
+    { id: "email", label: "EMAIL", category: "Data Awal", applies: false, link: "", rawFlag: "" },
+    { id: "id-instansi", label: "ID INSTANSI", category: "Data Awal", applies: false, link: "", rawFlag: "" },
+    { id: "prodi-asal", label: "PRODI ASAL", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", options: ["Diploma III Akuntansi", "Diploma III Akuntansi Pemerintah", "Diploma III Kebendaharaan Negara", "Diploma III Anggaran", "Diploma III Pajak", "Diploma III Perpajakan", "Diploma III Kepabeanan dan Cukai", "Diploma III Bea dan Cukai", "Diploma III PBB/Penilai", "Diploma III Pengurusan Piutang dan Lelang Negara", "Diploma III Manajemen Aset", "Diploma I Pajak", "Diploma I Perpajakan", "Diploma I Administrasi Perpajakan", "Diploma I Kepabeanan dan Cukai", "Diploma I Bea dan Cukai", "Diploma I Lainnya"] },
+    { id: "status-pilihan-prodi", label: "STATUS PILIHAN PRODI", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "computed" },
+    { id: "prioritas-pilihan-prodi-1", label: "PRIORITAS PILIHAN PRODI 1", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-2", label: "PRIORITAS PILIHAN PRODI 2", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-3", label: "PRIORITAS PILIHAN PRODI 3", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-4", label: "PRIORITAS PILIHAN PRODI 4", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "prioritas-pilihan-prodi-5", label: "PRIORITAS PILIHAN PRODI 5", category: "Data Awal", applies: true, link: "", rawFlag: "", fieldType: "select", dependsOn: "prodi-asal" },
+    { id: "kesesuaian-antara-pendidikan-awal-dengan-prodi-tujuan", label: "Kesesuaian antara Pendidikan Awal dengan Prodi Tujuan", category: "Checklist Non-Dokumen", applies: false, link: "", rawFlag: "" },
+    { id: "pendaftar-tidak-pernah-dibatalkandihentikan-tugas-belajarnya-sesuai-dengan-ketentuan-peraturan-perundang-undangan-dalam-waktu-dua-tahun-terakhir-terhitung-mundur-dari-tanggal-pengumuman-spmb-pt-pkn-stan-tahun-2026", label: "Pendaftar tidak pernah dibatalkan/dihentikan tugas belajarnya sesuai dengan ketentuan peraturan perundang-undangan dalam waktu dua tahun terakhir terhitung mundur dari tanggal Pengumuman SPMB-PT PKN STAN Tahun 2026", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "memenuhi-persyaratan-sesuai-dengan-ketentuan-kepegawaiantugas-belajar-yang-berlaku-di-klpd", label: "Memenuhi persyaratan sesuai dengan ketentuan kepegawaian/tugas belajar yang berlaku di KLPD", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "diusulkan-oleh-pejabat-pimpinan-tinggi-utamamadyapratama-yang-berwenang-di-bidang-kepegawaian", label: "Diusulkan oleh Pejabat Pimpinan Tinggi Utama/Madya/Pratama yang berwenang di bidang kepegawaian", category: "Checklist Non-Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "pasfoto-berwarna-berformat-jpg-3-bulan-terakhir-pic-peserta", label: "Pasfoto Berwarna Berformat .jpg (3 Bulan Terakhir) (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "scan-surat-keterangan-sehat-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta", label: "Scan Surat Keterangan Sehat dari Rumah Sakit Pemerintah Berformat PDF (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "scan-surat-keterangan-kesehatan-jiwa-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta", label: "Scan Surat Keterangan Kesehatan Jiwa dari Rumah Sakit Pemerintah Berformat PDF (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "scan-surat-keterangan-bebas-tbc-hepatitis-dan-hivaids-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta", label: "Scan Surat Keterangan Bebas TBC, Hepatitis, dan HIV/AIDS dari Rumah Sakit Pemerintah Berformat PDF (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "scan-surat-keterangan-bebas-napza-dari-rumah-sakit-pemerintah-berformat-pdf-pic-peserta", label: "Scan Surat Keterangan Bebas NAPZA dari Rumah Sakit Pemerintah Berformat PDF (PIC: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "surat-pernyataan-memenuhi-persyaratan-tb-dan-belum-pernah-diberhentikan-mengundurkan-diri-dari-tb-sebelumnya-tte-dan-e-materai-atau-tanda-tangan-basah-dan-materai-tempel-berformat-pdf-subjek-peserta", label: "Surat Pernyataan Memenuhi Persyaratan TB dan Belum Pernah Diberhentikan/ Mengundurkan Diri dari TB Sebelumnya ((TTE dan e-Materai) atau (Tanda Tangan Basah dan Materai Tempel) Berformat PDF (Subjek: Peserta)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "surat-pernyataan-tentang-pemilihan-dan-persetujuan-alokasi-program-studi-tte-atau-tanda-tangan-basah-berformat-pdf-subjek-peserta-dan-unit-kerja", label: "Surat Pernyataan tentang Pemilihan dan Persetujuan Alokasi Program Studi (TTE atau Tanda Tangan Basah) Berformat PDF (Subjek: Peserta dan Unit Kerja)", category: "Checklist Dokumen", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
+    { id: "link", label: "Link", category: "Link Penting", applies: true, link: "", rawFlag: "Wajib untuk Semua Unit Kerja" },
 ];
 
 export const allClusterIds = ['kemenkeu', 'klpd'] as const;

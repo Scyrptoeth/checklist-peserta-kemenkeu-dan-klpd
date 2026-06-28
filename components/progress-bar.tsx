@@ -8,6 +8,7 @@ interface ProgressBarProps {
   sublabel?: string;
   size?: "sm" | "md";
   className?: string;
+  hidePercent?: boolean;
 }
 
 export function ProgressBar({
@@ -16,6 +17,7 @@ export function ProgressBar({
   sublabel,
   size = "md",
   className,
+  hidePercent,
 }: ProgressBarProps) {
   const safePercent = Math.min(100, Math.max(0, percent));
 
@@ -25,15 +27,17 @@ export function ProgressBar({
         <span className={cn("font-medium text-ink-900", size === "sm" ? "text-sm" : "text-base")}>
           {label}
         </span>
-        <span
-          className={cn(
-            "font-mono font-semibold tabular-nums",
-            size === "sm" ? "text-sm" : "text-base",
-            safePercent === 100 ? "text-emerald-700" : "text-brand-700"
-          )}
-        >
-          {safePercent}%
-        </span>
+        {!hidePercent && (
+          <span
+            className={cn(
+              "font-mono font-semibold tabular-nums",
+              size === "sm" ? "text-sm" : "text-base",
+              safePercent === 100 ? "text-emerald-700" : "text-brand-700"
+            )}
+          >
+            {safePercent}%
+          </span>
+        )}
       </div>
       {sublabel && <p className="mt-0.5 text-xs text-ink-600">{sublabel}</p>}
       <div
