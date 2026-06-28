@@ -2,6 +2,51 @@
 
 ## Latest Update
 
+**2026-06-28 — Rebuild Buku Panduan dari nol dengan font Shree Devanagari 714, screenshot utuh tanpa crop, push, dan deploy production.**
+
+- **Buku Panduan baru:**
+  - `app/buku-panduan/page.tsx` ditulis ulang dari nol sebagai sumber PDF baru, bukan melanjutkan struktur panduan lama.
+  - Konten mencakup seluruh alur pengguna: halaman awal, tombol Buku Panduan, pilih klaster, pilih sub-klaster Kemenkeu, Data Awal, Checklist Dokumen, Checklist Non-Dokumen, progress desktop/mobile, Export JSON, Import JSON, Reset, Link Penting, Feedback Anonim, promo header, tombol kembali/logo, footer/kontak, catatan Developer, dan keamanan data.
+  - Semua narasi panduan memakai sapaan "Kamu" dan gaya formal-profesional.
+  - Font lokal `update/6-shree-devanagari-714.ttf` dipakai melalui `next/font/local`; `pdffonts` memverifikasi `ShreeDev0714` embedded di PDF.
+
+- **Screenshot baru tanpa bagian terpotong:**
+  - Screenshot yang dipakai panduan dipindahkan ke `public/guide-screenshots/`.
+  - `scripts/generate-guide.mjs` dibuat ulang agar memakai full-page screenshot, full component screenshot, atau full dialog screenshot. Tidak ada `clip` manual pada screenshot yang dipakai.
+  - Untuk menghindari overlay/crop dari sticky header, generator menonaktifkan sticky positioning saat mengambil screenshot komponen dan menyembunyikan header khusus untuk screenshot panel mobile.
+  - PDF menampilkan gambar dengan rasio asli (`img` height auto + max-height) supaya gambar diskalakan, bukan dipotong.
+
+- **File PDF:**
+  - Output final: `public/buku-panduan.pdf`.
+  - Metadata final: A4, 17 halaman, `application/pdf`, ukuran sekitar 2.04 MB.
+  - PDF live terverifikasi di `https://ceklis-tubel.vercel.app/buku-panduan.pdf`.
+
+- **Landing page dan sapaan:**
+  - Tombol `Buku Panduan` tetap hanya ada di halaman awal dan mengarah ke `/buku-panduan.pdf`.
+  - Tombol ditambah `aria-label="Buku Panduan"` dan icon dibuat `aria-hidden`.
+  - Teks publik yang terekam screenshot diseragamkan ke "Kamu" (`app/page.tsx`, `app/checklist/kemenkeu/page.tsx`, `components/progress-panel.tsx`, `lib/data/status-utils.ts`, `app/not-found.tsx`, `components/developer-login-form.tsx`).
+
+- **Git, push, dan deployment:**
+  - Commit final setelah rebase remote: `beb240d feat(guide): rebuild Buku Panduan PDF`.
+  - Push ke `origin/main` berhasil.
+  - Vercel production auto-deploy berhasil: `https://checklist-peserta-kemenkeu-dan-klpd-4ezcgdshf.vercel.app`.
+  - Alias production terverifikasi: `https://ceklis-tubel.vercel.app`.
+  - Deployment inspect: `dpl_EXhAyATjrzmkjH7bJWDi5t4nnKrC`, status Ready.
+
+- **Verifikasi:**
+  - `npm run build` sukses.
+  - `npm run typecheck` sukses.
+  - Browser lokal memverifikasi tombol Buku Panduan muncul 1 kali di halaman awal, 0 kali di `/checklist/klpd`, 0 kali di `/checklist/kemenkeu`, dan PDF lokal merespons `200 application/pdf`.
+  - Live `curl -I https://ceklis-tubel.vercel.app/buku-panduan.pdf?v=beb240d` merespons `200`, `content-type: application/pdf`, `content-length: 2041239`.
+  - Render visual PDF via `pdftoppm` dicek pada halaman landing, Data Awal, Checklist Dokumen, mobile progress, dan Reset; screenshot tampil utuh tanpa potongan kontainer.
+
+- **Catatan worktree:**
+  - `update/5-header.png` tetap untracked dan tidak dipakai dalam commit/deploy.
+
+---
+
+## Latest Update
+
 **2026-06-28 — Penambahan Buku Panduan lengkap dengan screenshot tahap demi tahap, file PDF, dan tombol unduhan di halaman awal.**
 
 - **Halaman Buku Panduan:**
@@ -158,6 +203,12 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 
 ## Lesson Learned
 
+- **Jika remote berubah saat proses release, regenerate artefak visual setelah rebase.** Screenshot/PDF yang benar sebelum rebase bisa menjadi stale ketika remote mengubah landing/footer; setelah rebase harus generate ulang sebelum amend/push.
+- **Untuk panduan PDF, screenshot elemen lebih aman daripada screenshot viewport yang dipotong.** Pakai locator/full component screenshot untuk Data Awal, checklist, progress, dialog, feedback, header, dan footer; hindari `clip` manual agar tidak ada bagian penting yang terpotong.
+- **Sticky UI dapat menimpa screenshot komponen.** Saat mengambil screenshot dokumentasi, nonaktifkan `position: sticky` atau sembunyikan header pada konteks tertentu supaya hasil gambar tidak tertutup overlay.
+- **`next/font/local` cocok untuk PDF berbasis browser.** Font Shree Devanagari 714 dapat di-embed ke PDF selama halaman sumber PDF memakai class font lokal dan PDF dibuat lewat Chromium.
+- **Dev server dan `next build` sebaiknya tidak berjalan bersamaan.** Keduanya memakai `.next`; menjalankan build saat dev aktif bisa menghasilkan cache rusak seperti `MODULE_NOT_FOUND` atau `e[o] is not a function`.
+- **Vercel CLI lokal perlu di-upgrade.** Sesi ini masih memakai `vercel 54.14.2`; versi tersedia `54.18.1`, jadi update dengan `npm i -g vercel@latest` atau `pnpm add -g vercel@latest` direkomendasikan untuk workflow deploy berikutnya.
 - **Prop subtitle/category sebaiknya diteruskan sebagai `React.ReactNode`, bukan `string`.** Karena label section sekarang berisi hyperlink eksternal, tipe string tidak cukup. Mengubah tipe menjadi `React.ReactNode` membuat komponen lebih fleksibel tanpa merusak existing behavior.
 - **`git add -A` berisiko mengcommit file untracked yang tidak terkait.** Dua asset gambar (`update/3-logo.png` dan `update/4-footer.png`) ikut tercommit bersama perubahan kode. Untuk sesi berikutnya, gunakan `git add <file>` secara selektif atau review `git status` sebelum commit.
 - **External link harus memiliki indikator visual dan atribut keamanan.** Kombinasi `target="_blank"`, `rel="noopener noreferrer"`, underline, dan icon external-link memenuhi ekspektasi accessibility dan keamanan.
@@ -218,12 +269,12 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
    Mengapa: URL Vercel bawaan panjang; custom domain meningkatkan trust dan kemudahan akses.
 
 10. **Perbarui screenshot dan PDF jika UI berubah signifikan**
-    File: `scripts/generate-guide.mjs`, `public/screenshots/`, `public/buku-panduan.pdf`.
+    File: `scripts/generate-guide.mjs`, `public/guide-screenshots/`, `public/buku-panduan.pdf`.
     Mengapa: Panduan harus selalu mencerminkan tampilan terbaru agar pengguna tidak bingung.
 
-11. **Pertimbangkan fallback font Shree Devanagari 714 jika file font tersedia di masa depan**
-    File: `app/buku-panduan/page.tsx`, `app/layout.tsx`, `tailwind.config.ts`.
-    Mengapa: User awalnya meminta font Shree Devanagari 714; jika file font disediakan nanti, PDF bisa di-render dengan font yang tepat.
+11. **Upgrade Vercel CLI lokal**
+    Target: `npm i -g vercel@latest` atau `pnpm add -g vercel@latest`.
+    Mengapa: CLI lokal masih `54.14.2`, sedangkan versi tersedia `54.18.1`; versi baru lebih sesuai untuk workflow agentic dan deploy berikutnya.
 
 ## Status Proyek
 
@@ -250,10 +301,13 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 | Buku Panduan page with screenshots | ✅ Done |
 | Buku Panduan PDF export | ✅ Done |
 | Buku Panduan button on landing page | ✅ Done |
+| Buku Panduan rebuilt from scratch | ✅ Done |
+| Screenshot panduan tanpa crop manual | ✅ Done |
+| Font Shree Devanagari 714 embedded in PDF | ✅ Done |
 | Quality gate | ✅ Passed |
 | GitHub repo | ✅ Done |
 | Vercel deploy | ✅ Live |
 | Link dokumen aktual | ✅ Done (subtitle links) |
 | Container Link Penting filled | ⏳ Pending |
 | Display rawFlag context in UI | ⏳ Pending |
-| Font Shree Devanagari 714 | ⏳ Pending (file font not provided) |
+| Vercel CLI latest | ⏳ Pending (`54.14.2` → `54.18.1`) |
