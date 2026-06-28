@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { kemenkeuClusters } from "@/lib/data/checklist-data";
+import { AnonymousFeedback } from "@/components/anonymous-feedback";
+import { SiteFooter } from "@/components/site-footer";
 import { StickyPageHeader } from "@/components/sticky-page-header";
 
 export default function KemenkeuSelectPage() {
@@ -32,6 +34,9 @@ export default function KemenkeuSelectPage() {
           ))}
         </div>
       </div>
+
+      <AnonymousFeedback />
+      <SiteFooter />
     </main>
   );
 }
