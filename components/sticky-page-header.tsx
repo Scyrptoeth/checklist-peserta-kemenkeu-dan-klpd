@@ -27,7 +27,7 @@ export function StickyPageHeader({
         className
       )}
     >
-      <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="grid h-full w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-3 sm:gap-8 sm:px-6">
         <div className="flex min-w-0 flex-col justify-center">
           {backHref && (
             <Link
@@ -43,19 +43,37 @@ export function StickyPageHeader({
               {breadcrumb}
             </p>
           )}
-          <h1 className="truncate text-lg font-bold tracking-tight text-ink-950 sm:text-xl lg:text-2xl">
+          <h1 className="truncate text-base font-bold tracking-tight text-ink-950 sm:text-xl lg:text-2xl">
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-0.5 line-clamp-1 text-xs text-ink-600 sm:text-sm">
+            <p className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-ink-600 sm:text-sm">
               {subtitle}
             </p>
           )}
         </div>
 
+        <a
+          href="https://s.id/tubelstan"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex flex-col items-center justify-center justify-self-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          aria-label="Daftar kelas gelombang terakhir Persiapantubel di s.id/tubelstan"
+        >
+          <span className="font-serif text-[11px] font-semibold leading-snug tracking-tight text-ink-950 sm:text-sm sm:leading-snug">
+            Daftar Kelas Gelombang Terakhir Sekarang!
+          </span>
+          <span className="mt-0.5 font-serif text-[11px] font-semibold leading-snug tracking-tight text-red-600 sm:text-sm sm:leading-snug">
+            Kuota Tersisa: 11!
+          </span>
+          <span className="mt-0.5 text-[9px] font-semibold tracking-wide text-brand-700 underline decoration-brand-500 underline-offset-2 transition-colors group-hover:text-brand-800 sm:text-xs">
+            Klik s.id/tubelstan
+          </span>
+        </a>
+
         <Link
           href="/"
-          className="group relative shrink-0 rounded-lg transition-colors hover:bg-ink-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          className="relative shrink-0 justify-self-end rounded-lg transition-colors hover:bg-ink-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           aria-label="Beranda"
         >
           <Image
@@ -64,7 +82,7 @@ export function StickyPageHeader({
             width={180}
             height={56}
             priority
-            className="h-14 w-auto object-contain sm:h-16 lg:h-24"
+            className="h-12 w-auto object-contain sm:h-16 lg:h-24"
           />
         </Link>
       </div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import { DM_Sans, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -11,6 +11,12 @@ const dmSans = DM_Sans({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-jetbrains-mono",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
   display: "swap",
 });
 
@@ -31,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${dmSans.variable} ${jetbrainsMono.variable}`}>
+    <html lang="id" className={`${dmSans.variable} ${jetbrainsMono.variable} ${playfair.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   );
