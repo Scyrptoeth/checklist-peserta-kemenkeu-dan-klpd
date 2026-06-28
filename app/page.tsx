@@ -8,8 +8,8 @@ export default function HomePage() {
   return (
     <main className="min-h-dvh bg-ink-50">
       <StickyPageHeader
-        title="Checklist Peserta"
-        subtitle="Pastikan seluruh persyaratan dokumen dan non-dokumen telah terpenuhi sebelum mendaftar."
+        title="Ceklis Tubel"
+        subtitle="Seluruh Data 100% Aman sebab Hanya Tersimpan secara Otomatis di Perangkat yang Kamu Gunakan."
       />
 
       <div className="mx-auto max-w-3xl px-6 py-10 sm:py-16">
@@ -21,7 +21,7 @@ export default function HomePage() {
             Pilih Klaster
           </h2>
           <p className="mt-4 text-balance text-lg text-ink-700">
-            Kemenkeu atau KLPD — pilih sesuai asal instansi Anda.
+            Kemenkeu atau KLPD — Pilih sesuai asal instansi Kamu.
           </p>
           <a
             href="/buku-panduan.pdf"
@@ -42,7 +42,7 @@ export default function HomePage() {
             </div>
             <h2 className="text-xl font-semibold text-ink-950">Kemenkeu</h2>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">
-              Untuk peserta dari Kementerian Keuangan: DJBC, DJP, DJPb, dan UE-1.
+              Untuk Peserta dari Kementerian Keuangan: DJBC, DJP, DJPb, dan UE-1.
             </p>
             <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-brand-700 group-hover:text-brand-900">
               Pilih sub-klaster <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -58,7 +58,7 @@ export default function HomePage() {
             </div>
             <h2 className="text-xl font-semibold text-ink-950">KLPD</h2>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">
-              Untuk peserta dari Kementerian/Lembaga/Pemerintah Daerah.
+              Untuk Peserta dari Kementerian/Lembaga/Pemerintah Daerah.
             </p>
             <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-brand-700 group-hover:text-brand-900">
               Buka checklist <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -67,7 +67,7 @@ export default function HomePage() {
         </div>
 
         <p className="mt-10 text-center text-xs text-ink-500">
-          Progress tersimpan otomatis di perangkat ini. Gunakan Export/Import JSON untuk memindahkan
+          Seluruh progress tersimpan otomatis di perangkat Kamu. Gunakan Export/Import JSON untuk memindahkan
           progress antar perangkat.
         </p>
       </div>
