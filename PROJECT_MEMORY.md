@@ -2,6 +2,35 @@
 
 ## Latest Update
 
+**2026-06-28 — Sticky header dengan logo di kanan blok judul, penambahan 2 dokumen Subjek: Unit Kerja untuk KLPD, dan deploy production.**
+
+Perubahan dikerjakan di branch `feat/klpd-unit-kerja-dokumen`, di-merge ke `main`, dan di-deploy ke Vercel production.
+
+- **Sticky header dengan logo di kanan judul:**
+  - Header tipis sebelumnya diganti dengan `components/sticky-page-header.tsx` yang memuat tombol kembali, breadcrumb, judul, subtitle di kiri, dan logo Persiapantubel di kanan.
+  - Header sticky di semua halaman: home, pemilih sub-klaster, checklist Kemenkeu, dan checklist KLPD.
+  - Tinggi header responsif: `h-24` mobile / `h-28` tablet / `h-32` desktop.
+  - Offset sticky internal disesuaikan: mobile progress panel (`top-24`), section header (`top-24`), desktop sidebar (`top-32`).
+  - File: `components/sticky-page-header.tsx`, `app/layout.tsx`, `app/page.tsx`, `app/checklist/kemenkeu/page.tsx`, `components/checklist-page-client.tsx`, `components/checklist-section.tsx`.
+
+- **Asset logo:**
+  - `update/3-logo.png` disalin ke `public/logo.png` agar bisa dioptimasi Next.js Image.
+
+- **Penambahan 2 dokumen Subjek: Unit Kerja untuk KLPD:**
+  - "Surat Rekomendasi Kepala Unit Kerja (TTE atau Tanda Tangan Basah dan Stemple) Berformat PDF (Subjek: Unit Kerja)"
+  - "Nota Dinas Usulan Pendaftar SPMB TB (TTE atau Tanda Tangan Basah dan Stempel) Berformat PDF (Subjek: Unit Kerja)"
+  - Kedua item ditambahkan melalui konstanta `KLPD_EXTRA_DOKUMEN_ITEMS` di `scripts/extract-checklist-data.py` dan diinject sebelum kolom Link saat regenerasi data, sehingga tersisten meskipun Excel diregenerate.
+  - File: `scripts/extract-checklist-data.py`, `lib/data/checklist-data.ts`.
+
+- **Verifikasi & deploy:**
+  - `npm run typecheck` dan `npm run build` lolos tanpa error.
+  - Branch `feat/klpd-unit-kerja-dokumen` → conventional commit → push → merge → push `main`.
+  - Deploy Vercel production: https://checklist-peserta-kemenkeu-dan-klpd.vercel.app
+
+---
+
+## Latest Update
+
 **2026-06-28 — Standarisasi label PIC→Subjek, pengelompokan Checklist Dokumen berdasarkan subjek, update placeholder Link Penting, dan deploy production.**
 
 Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main`, dan di-deploy ke Vercel production.
@@ -94,6 +123,8 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 | Label PIC→Subjek standardization | ✅ Done |
 | Checklist Dokumen grouped by subject | ✅ Done |
 | Link Penting placeholder updated | ✅ Done |
+| Sticky header with logo (title left, logo right) | ✅ Done |
+| KLPD Unit Kerja dokumen items added | ✅ Done |
 | Quality gate | ✅ Passed |
 | GitHub repo | ✅ Done |
 | Vercel deploy | ✅ Live |
