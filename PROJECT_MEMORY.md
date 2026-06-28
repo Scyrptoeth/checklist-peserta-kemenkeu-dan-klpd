@@ -2,6 +2,37 @@
 
 ## Latest Update
 
+**2026-06-28 — Penambahan Buku Panduan lengkap dengan screenshot tahap demi tahap, file PDF, dan tombol unduhan di halaman awal.**
+
+- **Halaman Buku Panduan:**
+  - URL: `/buku-panduan`.
+  - Konten mencakup pengenalan website, pemilihan klaster & sub-klaster, pengisian Data Awal, Checklist Dokumen, Checklist Non-Dokumen, Link Penting, progress panel, Export/Import JSON, Reset, Feedback Anonim, Klik Iklan Promosi, dan catatan keamanan data.
+  - Menggunakan kata sapaan "Kamu" dengan nuansa formal-profesional dan tidak kaku.
+  - Setiap bagian penting disertai screenshot langkah penggunaan.
+  - Font heading menggunakan Playfair Display (serif) dan body menggunakan DM Sans sebagai alternatif dari Shree Devanagari 714 yang tidak tersedia di sistem.
+  - File: `app/buku-panduan/page.tsx`.
+
+- **File PDF:**
+  - Output PDF `public/buku-panduan.pdf` dihasilkan dari halaman `/buku-panduan` menggunakan Playwright dengan Chrome headless.
+  - PDF berukuran A4, 11 halaman, dengan print background enabled.
+  - Script generate: `scripts/generate-guide.mjs`.
+
+- **Screenshot panduan:**
+  - Disimpan di `public/screenshots/` dengan nama `01-landing.png`, `02-pilih-subklaster.png`, `03-checklist-data-awal.png`, `04-checklist-dokumen.png`, `05-checklist-non-dokumen.png`, `06-progress-panel.png`, `07-link-penting.png`, `08-feedback.png`, `09-promo.png`.
+
+- **Tombol Buku Panduan di landing page:**
+  - Hanya muncul di halaman awal (`app/page.tsx`) dan mengarah ke `/buku-panduan.pdf`.
+  - Desain mempertimbangkan hierarki visual: tombol berada di bawah judul "Pilih Klaster" dengan gaya outlined brand agar tidak bersaing dengan kartu klaster utama.
+
+- **Verifikasi & deploy:**
+  - `npm run typecheck` dan `npm run build` lolos tanpa error.
+  - Commit: `feat(guide): add Buku Panduan page, screenshots, PDF, and landing button`.
+  - Push ke `main` dan deploy Vercel production: https://ceklis-tubel.vercel.app.
+
+---
+
+## Latest Update
+
 **2026-06-28 — Promo banner Persiapantubel di sticky header, redesign transparan dengan Playfair Display, dan deploy production.**
 
 Perubahan dikerjakan di branch `feat/promo-header`, di-merge ke `main`, dan di-deploy ke Vercel production.
@@ -145,6 +176,10 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 - **Spotlight UI tidak selalu membutuhkan background/card.** Dengan hierarki tipografi yang kuat (font serif mewah + warna highlight + underline), promosi transparan tetap menarik perhatian tanpa mengganggu kebersihan header.
 - **Menambahkan font display melalui `next/font/google` murah dan aman.** Cukup tambahkan variabel CSS dan daftarkan di `tailwind.config.ts`; tidak perlu manual preload atau FOIC handling.
 - **Pastikan elemen spotlight memiliki lebar tetap (fixed/min-width) agar tidak "terdorong" oleh konten sekitarnya.** Elemen penting harus menjadi anchor; elemen pendukunglah yang menyesuaikan.
+- **Playwright sangat efektif untuk generate screenshot dan PDF dari halaman Next.js secara lokal.** Dengan `executablePath` menunjuk ke Chrome yang sudah terinstall, tidak perlu download browser tambahan.
+- **Generate screenshot sebelum generate PDF agar gambar sudah tersedia saat halaman panduan dirender.** Urutan ini menghindari broken image di PDF akhir.
+- **Menyertakan PDF dan screenshot di `public/` memudahkan deployment static file.** Vercel secara otomatis melayani file-file tersebut di root domain.
+- **Tombol sekunder di landing page sebaiknya tidak bersaing dengan CTA utama.** Menggunakan outlined button dengan icon membedakan Buku Panduan dari kartu klaster utama.
 
 ## Next Action Recommended
 
@@ -182,6 +217,14 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 9. **Custom domain (opsional)**
    Mengapa: URL Vercel bawaan panjang; custom domain meningkatkan trust dan kemudahan akses.
 
+10. **Perbarui screenshot dan PDF jika UI berubah signifikan**
+    File: `scripts/generate-guide.mjs`, `public/screenshots/`, `public/buku-panduan.pdf`.
+    Mengapa: Panduan harus selalu mencerminkan tampilan terbaru agar pengguna tidak bingung.
+
+11. **Pertimbangkan fallback font Shree Devanagari 714 jika file font tersedia di masa depan**
+    File: `app/buku-panduan/page.tsx`, `app/layout.tsx`, `tailwind.config.ts`.
+    Mengapa: User awalnya meminta font Shree Devanagari 714; jika file font disediakan nanti, PDF bisa di-render dengan font yang tepat.
+
 ## Status Proyek
 
 | Area | Status |
@@ -204,9 +247,13 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 | Section labels with official references & links | ✅ Done |
 | Reorder: Data Awal → Dokumen → Non-Dokumen | ✅ Done |
 | Promo banner sticky header (Playfair Display, transparan) | ✅ Done |
+| Buku Panduan page with screenshots | ✅ Done |
+| Buku Panduan PDF export | ✅ Done |
+| Buku Panduan button on landing page | ✅ Done |
 | Quality gate | ✅ Passed |
 | GitHub repo | ✅ Done |
 | Vercel deploy | ✅ Live |
 | Link dokumen aktual | ✅ Done (subtitle links) |
 | Container Link Penting filled | ⏳ Pending |
 | Display rawFlag context in UI | ⏳ Pending |
+| Font Shree Devanagari 714 | ⏳ Pending (file font not provided) |
