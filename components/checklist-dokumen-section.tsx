@@ -12,6 +12,7 @@ interface ChecklistDokumenSectionProps {
   checked: Record<string, boolean>;
   onToggle: (id: string) => void;
   stats: { total: number; done: number; percent: number };
+  category?: React.ReactNode;
 }
 
 const SUBJECT_ORDER = [
@@ -77,6 +78,7 @@ export function ChecklistDokumenSection({
   checked,
   onToggle,
   stats,
+  category = "Kelengkapan dokumen administrasi",
 }: ChecklistDokumenSectionProps) {
   const grouped = new Map<string, ChecklistItem[]>();
   for (const item of items) {
@@ -114,7 +116,7 @@ export function ChecklistDokumenSection({
             <h2 className="text-lg font-semibold tracking-tight text-ink-950">
               Checklist Dokumen
             </h2>
-            <p className="text-sm text-ink-600">Kelengkapan dokumen administrasi</p>
+            <p className="text-sm text-ink-600">{category}</p>
           </div>
           <div className="w-40 sm:w-48">
             <ProgressBar

@@ -12,6 +12,7 @@ interface DataAwalSectionProps {
   onChange: (id: string, value: string) => void;
   statusText: string;
   statusDone: boolean;
+  subtitle?: React.ReactNode;
 }
 
 const DATA_AWAL_ORDER = [
@@ -77,6 +78,7 @@ export function DataAwalSection({
   onChange,
   statusText,
   statusDone,
+  subtitle = "Informasi dasar Calon Peserta",
 }: DataAwalSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const itemMap = new Map(items.map((item) => [item.id, item]));
@@ -92,7 +94,7 @@ export function DataAwalSection({
         <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold tracking-tight text-ink-950">Data Awal</h2>
-            <p className="text-sm text-ink-600">Informasi dasar Calon Peserta</p>
+            <p className="text-sm text-ink-600">{subtitle}</p>
           </div>
           <button
             type="button"

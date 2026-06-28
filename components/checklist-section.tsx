@@ -9,7 +9,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface ChecklistSectionProps {
   title: string;
-  category: string;
+  category: React.ReactNode;
   items: ChecklistItemType[];
   checked: Record<string, boolean>;
   onToggle: (id: string) => void;
