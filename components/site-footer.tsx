@@ -1,6 +1,6 @@
 import { Github, Mail, MessageCircle } from "lucide-react";
 
-const githubUrl = "https://github.com/Scyrptoeth/checklist-peserta-kemenkeu-dan-klpd";
+const githubUrl = "https://persiapantubel.com/product";
 const supportPhoneLabel = "0822-9411-6001 (Goradok Pande Raja Sinabutar / Dedek)";
 const supportEmail = "dedekfidelis@gmail.com";
 
@@ -15,8 +15,8 @@ export function SiteFooter() {
           Checklist Peserta SPMB PT PKN STAN 2026 — Kemenkeu &amp; KLPD
         </p>
         <p className="mx-auto mt-3 max-w-xl text-sm text-ink-600">
-          Progress tersimpan otomatis di perangkat ini. Gunakan Export/Import JSON untuk
-          memindahkan progress antar perangkat.
+          Seluruh Data 100% Aman sebab Hanya Tersimpan secara Otomatis di Perangkat yang Kamu Gunakan.
+          Doa Baik untuk Semua Persiapan Kamu!
         </p>
 
         <nav
