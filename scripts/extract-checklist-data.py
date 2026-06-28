@@ -35,6 +35,19 @@ def ts_escape(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
 
 
+def normalize_label(label: str) -> str:
+    """Standardize legacy 'PIC:' suffix to 'Subjek:' in checklist labels."""
+    return re.sub(r"\(PIC:\s*", "(Subjek: ", label, flags=re.IGNORECASE)
+
+
+def parse_subject(label: str) -> str | None:
+    """Extract trailing '(Subjek: ...)' suffix used for document grouping."""
+    match = re.search(r"\((Subjek:[^)]+)\)$", label)
+    if match:
+        return match.group(1).strip()
+    return None
+
+
 def parse_flag(value, cluster: str | None = None):
     if pd.isna(value):
         return False
@@ -112,12 +125,15 @@ def extract_checklist(path: Path, sheet_name: str, cluster: str | None = None):
         else:
             active = parse_flag(flag_value, cluster)
 
+        label = normalize_label(h)
+        subject = parse_subject(label) if cat == "Checklist Dokumen" else None
         categories.append({
             "id": slugify(h),
-            "label": h,
+            "label": label,
             "category": cat,
             "applies": active,
             "rawFlag": str(flag_value).strip() if not pd.isna(flag_value) else "",
+            "subject": subject,
         })
 
     return categories
@@ -283,6 +299,7 @@ def emit_checklist_data(data: dict):
         '  applies: boolean;',
         '  link?: string;',
         '  rawFlag?: string;',
+        '  subject?: string;',
         '  fieldType?: DataAwalFieldType;',
         '  options?: string[];',
         '  dependsOn?: string;',
@@ -348,6 +365,7 @@ def emit_checklist_data(data: dict):
 def emit_item(item: dict) -> str:
     link = item.get("link", "")
     raw = item.get("rawFlag", "")
+    subject = item.get("subject", "")
     parts = [
         f'id: "{item["id"]}"',
         f'label: "{ts_escape(item["label"])}"',
@@ -356,6 +374,8 @@ def emit_item(item: dict) -> str:
         f'link: "{ts_escape(link)}"',
         f'rawFlag: "{ts_escape(raw)}"',
     ]
+    if subject:
+        parts.append(f'subject: "{ts_escape(subject)}"')
     if item.get("fieldType"):
         parts.append(f'fieldType: "{item["fieldType"]}"')
     if item.get("options") is not None:

@@ -16,10 +16,7 @@ export function LinkContainer({ links }: LinkContainerProps) {
         <h2 className="text-lg font-semibold tracking-tight text-ink-950">Link Penting</h2>
       </div>
       {filledLinks.length === 0 ? (
-        <p className="text-sm leading-relaxed text-ink-600">
-          Container link dokumen telah disiapkan. Link format dokumen akan diisi di sini setelah
-          seluruh rujukan terkumpul.
-        </p>
+        <p className="text-sm leading-relaxed text-ink-600">Akan segera diperbarui.</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {filledLinks.map((link, idx) => (

@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { ChecklistItem } from "@/lib/data/checklist-data";
 import { useChecklistProgress } from "@/hooks/use-checklist-progress";
 import { ChecklistSection } from "./checklist-section";
+import { ChecklistDokumenSection } from "./checklist-dokumen-section";
 import { LinkContainer } from "./link-container";
 import { ProgressPanel } from "./progress-panel";
 import { DataAwalSection } from "./data-awal-section";
@@ -115,9 +116,7 @@ export function ChecklistPageClient({
                 onToggle={toggle}
                 stats={stats.nonDokumen}
               />
-              <ChecklistSection
-                title="Checklist Dokumen"
-                category="Kelengkapan dokumen administrasi"
+              <ChecklistDokumenSection
                 items={dokumenItems}
                 checked={checked}
                 onToggle={toggle}

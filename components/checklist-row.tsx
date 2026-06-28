@@ -11,7 +11,7 @@ interface ChecklistRowProps {
 }
 
 export function ChecklistRow({ item, checked, onToggle }: ChecklistRowProps) {
-  const docSubject = item.label.match(/\(([^)]+)\)$/)?.[1];
+  const docSubject = item.subject ?? item.label.match(/\(([^)]+)\)$/)?.[1];
   const mainLabel = docSubject ? item.label.replace(/\s*\([^)]+\)$/, "") : item.label;
 
   return (
