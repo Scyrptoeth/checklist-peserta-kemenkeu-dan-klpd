@@ -2,30 +2,57 @@
 
 ## Latest Update
 
-**2026-06-28 — Iterasi UI checklist berdasarkan gambar `1-data-awal.png`.**
+**2026-06-28 — Transformasi Data Awal menjadi form input, layout progress sticky, dan deploy production.**
 
-Perubahan dikerjakan di branch `feat/sticky-expand-hidden-fields`, di-merge ke `main`, dan di-deploy ke Vercel production.
+Perubahan dikerjakan di branch `feat/data-awal-form-and-progress`, di-merge ke `main`, dan di-deploy ke Vercel production.
 
-- **Sembunyikan 6 field Data Awal (kotak merah)** dari tampilan dan perhitungan progress untuk Kemenkeu dan KLPD:
-  - `Unit/Satuan Kerja`
-  - `Nama PIC Unit/Satuan Kerja`
-  - `NIP`
-  - `NAMA`
-  - `EMAIL`
-  - `ID INSTANSI`
-  - File: `scripts/extract-checklist-data.py` + regenerasi `lib/data/checklist-data.ts`.
-- **Sticky header** untuk `Data Awal`, `Checklist Non-Dokumen`, dan `Checklist Dokumen` agar pengguna tetap tahu posisi dan progress saat scroll.
-- **Tombol icon expand/collapse** (chevron up/down) di setiap section header agar pengguna bisa merapikan tampilan setelah menyelesaikan suatu bagian.
-- **Git workflow:** branch → conventional commit → push → merge → push `main`.
-- **Deploy Vercel production:** https://checklist-peserta-kemenkeu-dan-klpd-dazqn67fn.vercel.app
+- **Layout progress sticky:**
+  - Panel *Progress Keseluruhan* pindah ke **kiri** sebagai sidebar sticky di desktop (`lg`).
+  - Versi mobile menggunakan **sticky top summary** yang bisa expand/collapse.
+  - Berlaku untuk semua klaster dan sub-klaster.
+  - File: `components/checklist-page-client.tsx`, `components/progress-panel.tsx`.
+
+- **Data Awal menjadi kolom isian (bukan checkbox):**
+  - `Unit Kerja`, `JALUR`, `PRODI ASAL`, `PRIORITAS PILIHAN PRODI 1–5`, dan `STATUS PILIHAN PRODI`.
+  - Dropdown bertingkat: Prioritas Prodi 1–5 bergantung pada `PRODI ASAL` sesuai mapping `K_*` di Excel.
+  - `STATUS PILIHAN PRODI` **terkomputasi** sesuai rumus Excel dengan indikator warna merah/hijau/oranye.
+  - File: `components/data-awal-section.tsx`, `lib/data/status-utils.ts`, `lib/data/reference-data.ts`.
+
+- **Mutual exclusivity antar Prioritas Prodi:**
+  - Prodi yang sudah dipilih di satu prioritas tidak muncul lagi di dropdown prioritas lain.
+  - Prioritas yang tersisa otomatis **disabled** ketika semua pilihan prodi tujuan (`_avail`) sudah dipilih.
+
+- **Progress Data Awal disembunyikan sepenuhnya:**
+  - Tidak ada badge `X/Y terisi`, progress bar, atau persentase di section Data Awal.
+  - *Progress Keseluruhan* hanya mencakup **Non-Dokumen + Dokumen**.
+  - Angka persentase dihilangkan dari seluruh progress bar; yang tersisa hanya bar visual dan count selesai/total.
+  - File: `components/data-awal-section.tsx`, `components/progress-bar.tsx`, `components/progress-panel.tsx`, `hooks/use-checklist-progress.ts`.
+
+- **Tombol Reset diperkecil:** style diubah menjadi tombol teks ringan dengan ikon, tidak lagi memakan ruang besar.
+
+- **Generator script diperbarui:**
+  - `scripts/extract-checklist-data.py` mengekstrak `BidangList`, mapping prodi tujuan, dan daftar instansi KLPD dari Excel.
+  - Menghasilkan `lib/data/reference-data.ts` dan meregenerasi `lib/data/checklist-data.ts` dengan metadata field Data Awal.
+
+- **State & storage:**
+  - `useChecklistProgress` menyimpan state `dataAwal` terpisah dari checkbox.
+  - Storage version naik ke **v2** — data lama v1 di-reset otomatis.
+  - Export/Import JSON mencakup Data Awal.
+
+- **Git workflow:** branch `feat/data-awal-form-and-progress` → conventional commit → push → merge → push `main`.
+- **Deploy Vercel production:** https://checklist-peserta-kemenkeu-dan-klpd.vercel.app
+
+---
 
 ## Lesson Learned
 
 - **Data auto-generated harus diupdate lewat generator script, bukan edit manual.** Field Data Awal yang disembunyikan ditandai di `scripts/extract-checklist-data.py` sebagai `HIDDEN_DATA_AWAL_LABELS`, lalu `lib/data/checklist-data.ts` diregenerasi. Ini menjaga konsistensi jika Excel berubah di masa depan.
 - **`applies: false` adalah cara paling bersih untuk menyembunyikan item dari UI dan progress.** Karena hook dan komponen sudah filter berdasarkan `applies`, satu perubahan di data file menyelesaikan dua masalah sekaligus (tidak ditampilkan + tidak masuk progress).
-- **Sticky header dengan `grid-template-rows` animation untuk expand/collapse** memberikan UX yang halus tanpa JS rumit. Perlu memastikan header punya `z-index` tinggi dan background solid/backup-blur agar konten di belakangnya tidak bocor.
-- **Desktop folder di macOS bisa memiliki atribut keamanan** (`com.apple.quarantine`, `com.apple.macl`, `com.apple.provenance`) yang memblokir proses server lokal/Node.js secara sporadis. Jika `next dev` mengalami `EPERM: operation not permitted`, solusinya adalah memindahkan project keluar dari Desktop atau memberi Full Disk Access ke aplikasi terminal/Kimi Code.
-- **Git workflow feature-branch tetap perlu dijaga meskipun user minta deploy cepat.** Commit langsung ke `main` dihindari; perubahan dikerjakan di branch, lalu di-merge dan push ke `main` untuk production deploy.
+- **Sticky sidebar membutuhkan parent flex dengan `align-items: stretch`.** Jika parent menggunakan `items-start`, kolom kiri hanya setinggi kontennya sendiri sehingga sticky tidak bisa mengikuti scroll.
+- **Menghindari angka persentase pada Data Awal mengurangi beban psikologis pengguna.** Karena jumlah prioritas prodi tujuan bervariasi antar PRODI ASAL, persentase membuat perasaan "kurang" yang tidak adil. Count selesai/total atau bar visual tanpa angka lebih netral.
+- **Mutual exclusivity di dropdown lebih baik daripada validasi error pasca-pilih.** Mencegah duplikat sejak awal lebih ramah pengguna daripada menampilkan status merah setelah terjadi kesalahan.
+- **Build Next.js di Vercel kadang menghasilkan lambda functions, bukan static pages.** Hal ini normal untuk App Router tanpa `output: 'export'`; yang penting deployment status Ready dan konten bisa diakses melalui canonical domain.
+- **Clean rebuild (hapus `.next`) sering diperlukan setelah perubahan besar.** Dev server yang berjalan di background dapat menyebabkan cache build korup dan error `PageNotFoundError`.
 
 ## Next Action Recommended
 
@@ -39,7 +66,7 @@ Perubahan dikerjakan di branch `feat/sticky-expand-hidden-fields`, di-merge ke `
 
 3. **Update README fitur**
    File: `README.md`.
-   Mengapa: Tambahkan sticky header, expand/collapse, dan field tersembunyi ke daftar fitur agar dokumentasi tetap akurat.
+   Mengapa: Dokumentasi perlu mencerminkan Data Awal sebagai form input, progress sticky, mutual exclusivity, dan hilangnya persentase.
 
 4. **Upgrade Next.js ke versi patched**
    File: `package.json`.
@@ -59,7 +86,10 @@ Perubahan dikerjakan di branch `feat/sticky-expand-hidden-fields`, di-merge ke `
 | Scaffolding | ✅ Done |
 | Data extraction | ✅ Done |
 | Routing & UI | ✅ Done |
-| Sticky header + expand/collapse | ✅ Done |
+| Sticky progress panel (kiri + mobile top) | ✅ Done |
+| Data Awal as form inputs | ✅ Done |
+| Mutual-exclusion Prioritas Prodi | ✅ Done |
+| STATUS PILIHAN PRODI terkomputasi | ✅ Done |
 | Hidden Data Awal fields | ✅ Done |
 | State management | ✅ Done |
 | Quality gate | ✅ Passed |
