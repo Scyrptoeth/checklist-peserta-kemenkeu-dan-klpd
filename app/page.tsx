@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Building2, Landmark } from "lucide-react";
+import { ArrowRight, BookOpen, Building2, Landmark } from "lucide-react";
 import { AnonymousFeedback } from "@/components/anonymous-feedback";
 import { SiteFooter } from "@/components/site-footer";
 import { StickyPageHeader } from "@/components/sticky-page-header";
@@ -23,6 +23,13 @@ export default function HomePage() {
           <p className="mt-4 text-balance text-lg text-ink-700">
             Kemenkeu atau KLPD — pilih sesuai asal instansi Anda.
           </p>
+          <a
+            href="/buku-panduan.pdf"
+            className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 shadow-sm transition-colors hover:bg-brand-50 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          >
+            <BookOpen className="h-4 w-4" />
+            Buku Panduan
+          </a>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
