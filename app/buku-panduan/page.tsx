@@ -25,8 +25,6 @@ type Step = {
   body: string;
 };
 
-const guideDate = "28 Juni 2026";
-
 function SectionTitle({
   number,
   title,
@@ -141,20 +139,6 @@ export default function BukuPanduanPage() {
           <p className="mt-4 max-w-2xl text-xl leading-relaxed text-ink-700">
             Checklist Peserta SPMB PT PKN STAN 2026 untuk Kemenkeu dan KLPD.
           </p>
-          <div className="mt-8 grid gap-4 border-t border-ink-200 pt-6 text-sm text-ink-700 sm:grid-cols-3">
-            <div>
-              <p className="font-bold text-ink-950">Alamat Website</p>
-              <p className="mt-1">https://ceklis-tubel.vercel.app/</p>
-            </div>
-            <div>
-              <p className="font-bold text-ink-950">Versi Panduan</p>
-              <p className="mt-1">{guideDate}</p>
-            </div>
-            <div>
-              <p className="font-bold text-ink-950">Sapaan Pengguna</p>
-              <p className="mt-1">Kamu</p>
-            </div>
-          </div>
           <Callout title="Tujuan panduan">
             <p>
               Panduan ini membantu Kamu memahami seluruh tombol, area, dan alur
