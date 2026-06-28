@@ -10,6 +10,7 @@ import { ProgressPanel } from "./progress-panel";
 import { DataAwalSection } from "./data-awal-section";
 import { SiteFooter } from "./site-footer";
 import { StickyPageHeader } from "./sticky-page-header";
+import { ExternalLink } from "lucide-react";
 
 interface ChecklistPageClientProps {
   clusterId: string;
@@ -17,6 +18,114 @@ interface ChecklistPageClientProps {
   clusterLabel: string;
   subclusterLabel?: string;
   items: ChecklistItem[];
+}
+
+function InlineExternalLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-0.5 font-medium text-brand-600 underline underline-offset-2 hover:text-brand-700 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1"
+    >
+      {children}
+      <ExternalLink className="h-3 w-3" aria-hidden="true" />
+    </a>
+  );
+}
+
+function getSectionSubtitles(clusterId: string, subclusterId?: string) {
+  const dataAwalSubtitle = (
+    <>
+      Sesuai dengan Kertas Kerja yang Dibagikan oleh PKN STAN di{" "}
+      <InlineExternalLink href="https://taplink.cc/formulirspmbpt2026">
+        https://taplink.cc/formulirspmbpt2026
+      </InlineExternalLink>
+    </>
+  );
+
+  let nonDokumenSubtitle: React.ReactNode;
+  if (clusterId === "kemenkeu") {
+    nonDokumenSubtitle = (
+      <>
+        Sesuai dengan Pasal 6 PMK 34 Tahun 2024 tentang Pengelolaan Tugas Belajar
+        bagi PNS di Lingkungan Kemenkeu yang bisa Diunduh di{" "}
+        <InlineExternalLink href="https://s.id/PMK-Tubel-Kemenkeu">
+          s.id/PMK-Tubel-Kemenkeu
+        </InlineExternalLink>
+      </>
+    );
+  } else {
+    nonDokumenSubtitle =
+      "Sesuai dengan Ketentuan Kepegawaian/Tugas Belajar yang Berlaku di KLPD Masing-Masing";
+  }
+
+  let dokumenSubtitle: React.ReactNode;
+  if (clusterId === "kemenkeu") {
+    switch (subclusterId) {
+      case "djbc":
+        dokumenSubtitle = (
+          <>
+            Sesuai dengan PENG-31/BC.01/2026 yang dapat Diunduh di{" "}
+            <InlineExternalLink href="https://s.id/Tubel-DJBC-2026">
+              s.id/Tubel-DJBC-2026
+            </InlineExternalLink>
+          </>
+        );
+        break;
+      case "djpb":
+        dokumenSubtitle = (
+          <>
+            Sesuai dengan ND-2360/PB.1/2026 yang dapat Diunduh di{" "}
+            <InlineExternalLink href="https://s.id/Tubel-DJPb-2026">
+              s.id/Tubel-DJPb-2026
+            </InlineExternalLink>
+          </>
+        );
+        break;
+      case "djp":
+        dokumenSubtitle = (
+          <>
+            Sesuai dengan PENG-380/PJ/PJ.01/2026 yang dapat Diunduh di{" "}
+            <InlineExternalLink href="https://s.id/Tubel-DJP-2026">
+              s.id/Tubel-DJP-2026
+            </InlineExternalLink>
+          </>
+        );
+        break;
+      case "ue-1":
+      default:
+        dokumenSubtitle = (
+          <>
+            Sesuai dengan PENG-19/PKN/2026 yang dapat Diunduh di{" "}
+            <InlineExternalLink href="https://s.id/PENG-Tubel-2026">
+              s.id/PENG-Tubel-2026
+            </InlineExternalLink>
+          </>
+        );
+    }
+  } else {
+    dokumenSubtitle = (
+      <>
+        Sesuai dengan PENG-19/PKN/2026 yang dapat Diunduh di{" "}
+        <InlineExternalLink href="https://s.id/PENG-Tubel-2026">
+          s.id/PENG-Tubel-2026
+        </InlineExternalLink>
+      </>
+    );
+  }
+
+  return {
+    dataAwal: dataAwalSubtitle,
+    nonDokumen: nonDokumenSubtitle,
+    dokumen: dokumenSubtitle,
+  };
 }
 
 export function ChecklistPageClient({
@@ -49,6 +158,8 @@ export function ChecklistPageClient({
   const linkItems = items
     .filter((item) => item.category === "Link Penting")
     .map((item) => ({ label: item.label, url: item.link }));
+
+  const subtitles = getSectionSubtitles(clusterId, subclusterId);
 
   return (
     <main className="min-h-dvh bg-ink-50 pb-20">
@@ -95,20 +206,22 @@ export function ChecklistPageClient({
                 onChange={setDataAwal}
                 statusText={stats.dataAwal.statusText ?? ""}
                 statusDone={stats.dataAwal.statusDone ?? false}
-              />
-              <ChecklistSection
-                title="Checklist Non-Dokumen"
-                category="Kesesuaian persyaratan kepegawaian"
-                items={nonDokumenItems}
-                checked={checked}
-                onToggle={toggle}
-                stats={stats.nonDokumen}
+                subtitle={subtitles.dataAwal}
               />
               <ChecklistDokumenSection
                 items={dokumenItems}
                 checked={checked}
                 onToggle={toggle}
                 stats={stats.dokumen}
+                category={subtitles.dokumen}
+              />
+              <ChecklistSection
+                title="Checklist Non-Dokumen"
+                category={subtitles.nonDokumen}
+                items={nonDokumenItems}
+                checked={checked}
+                onToggle={toggle}
+                stats={stats.nonDokumen}
               />
               <LinkContainer links={linkItems} />
             </div>
