@@ -12,11 +12,11 @@ export function SiteFooter() {
     >
       <div className="mx-auto max-w-3xl px-6">
         <p className="text-base font-semibold text-ink-950">
-          Checklist Peserta SPMB PT PKN STAN 2026 — Kemenkeu &amp; KLPD
+          Ceklis Tubel — Peserta SPMB PT PKN STAN 2026
         </p>
         <p className="mx-auto mt-3 max-w-xl text-sm text-ink-600">
-          Seluruh Data 100% Aman sebab Hanya Tersimpan secara Otomatis di Perangkat yang Kamu Gunakan.
-          Doa Baik untuk Semua Persiapan Kamu!
+          Gunakan PENG-19/PKN/2026 & Ketentuan dari Instansi Kamu sebagai Rujukan Utama.
+          Sampai Bertemu Kembali di Bintaro!
         </p>
 
         <nav
@@ -54,7 +54,7 @@ export function SiteFooter() {
         </nav>
 
         <p className="mt-10 text-xs text-ink-500">
-          &copy; {new Date().getFullYear()} Checklist Peserta Kemenkeu &amp; KLPD
+          &copy; {new Date().getFullYear()} Ceklis Tubel — Peserta SPMB PT PKN STAN 2026 
         </p>
       </div>
     </footer>
