@@ -21,12 +21,12 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Checklist Peserta SPMB PT PKN STAN 2026 — Kemenkeu & KLPD",
+  title: "Ceklis Tubel — SPMB PT PKN STAN 2026",
   description:
-    "Aplikasi checklist interaktif untuk memastikan seluruh persyaratan dokumen dan non-dokumen SPMB PT PKN STAN 2026 telah terpenuhi.",
+    "Aplikasi Ceklis Interaktif untuk Memastikan Seluruh Persyaratan Dokumen dan Non-Dokumen SPMB PT PKN STAN 2026 telah Terpenuhi.",
   openGraph: {
-    title: "Checklist Peserta SPMB PT PKN STAN 2026",
-    description: "Kemenkeu & KLPD — Dokumen & Non-Dokumen",
+    title: "Ceklis Tubel",
+    description: "Peserta SPMB PT PKN STAN 2026",
     type: "website",
   },
 };
