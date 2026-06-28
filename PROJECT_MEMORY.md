@@ -2,45 +2,37 @@
 
 ## Latest Update
 
-**2026-06-28 — Transformasi Data Awal menjadi form input, layout progress sticky, dan deploy production.**
+**2026-06-28 — Standarisasi label PIC→Subjek, pengelompokan Checklist Dokumen berdasarkan subjek, update placeholder Link Penting, dan deploy production.**
 
-Perubahan dikerjakan di branch `feat/data-awal-form-and-progress`, di-merge ke `main`, dan di-deploy ke Vercel production.
+Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main`, dan di-deploy ke Vercel production.
 
-- **Layout progress sticky:**
-  - Panel *Progress Keseluruhan* pindah ke **kiri** sebagai sidebar sticky di desktop (`lg`).
-  - Versi mobile menggunakan **sticky top summary** yang bisa expand/collapse.
-  - Berlaku untuk semua klaster dan sub-klaster.
-  - File: `components/checklist-page-client.tsx`, `components/progress-panel.tsx`.
+- **Standarisasi label dokumen:**
+  - Semua label `(PIC: Peserta)` dan `(PIC: Unit Kerja)` dalam kategori *Checklist Dokumen* distandarisasi menjadi `(Subjek: Peserta)` dan `(Subjek: Unit Kerja)`.
+  - Normalisasi dilakukan di generator script agar tersisten saat data diregenerate dari Excel.
+  - File: `scripts/extract-checklist-data.py`, `lib/data/checklist-data.ts`.
 
-- **Data Awal menjadi kolom isian (bukan checkbox):**
-  - `Unit Kerja`, `JALUR`, `PRODI ASAL`, `PRIORITAS PILIHAN PRODI 1–5`, dan `STATUS PILIHAN PRODI`.
-  - Dropdown bertingkat: Prioritas Prodi 1–5 bergantung pada `PRODI ASAL` sesuai mapping `K_*` di Excel.
-  - `STATUS PILIHAN PRODI` **terkomputasi** sesuai rumus Excel dengan indikator warna merah/hijau/oranye.
-  - File: `components/data-awal-section.tsx`, `lib/data/status-utils.ts`, `lib/data/reference-data.ts`.
+- **Pengelompokan Checklist Dokumen berdasarkan subjek:**
+  - Komponen baru `ChecklistDokumenSection` menampilkan 3 sub-bagian jelas:
+    1. **Subjek: Peserta** — aksen biru (`brand-500`).
+    2. **Subjek: Peserta dan Unit Kerja** — aksen oranye/amber (`amber-500`).
+    3. **Subjek: Unit Kerja** — aksen hijau (`emerald-600`).
+  - Setiap sub-bagian punya header berwarna, progress mini, dan pembatas visual (border-top tebal) sehingga pengguna bisa membedakan dengan cepat.
+  - Sub-bagian bisa diciutkan/dikembangkan secara independen.
+  - File: `components/checklist-dokumen-section.tsx`, `components/checklist-page-client.tsx`.
 
-- **Mutual exclusivity antar Prioritas Prodi:**
-  - Prodi yang sudah dipilih di satu prioritas tidak muncul lagi di dropdown prioritas lain.
-  - Prioritas yang tersisa otomatis **disabled** ketika semua pilihan prodi tujuan (`_avail`) sudah dipilih.
+- **Field `subject` pada data model:**
+  - `ChecklistItem` ditambahkan field opsional `subject` yang diekstrak otomatis dari suffix label saat generate data.
+  - `ChecklistRow` memakai `item.subject` jika tersedia, dengan fallback parse label.
+  - File: `scripts/extract-checklist-data.py`, `lib/data/checklist-data.ts`, `components/checklist-row.tsx`.
 
-- **Progress Data Awal disembunyikan sepenuhnya:**
-  - Tidak ada badge `X/Y terisi`, progress bar, atau persentase di section Data Awal.
-  - *Progress Keseluruhan* hanya mencakup **Non-Dokumen + Dokumen**.
-  - Angka persentase dihilangkan dari seluruh progress bar; yang tersisa hanya bar visual dan count selesai/total.
-  - File: `components/data-awal-section.tsx`, `components/progress-bar.tsx`, `components/progress-panel.tsx`, `hooks/use-checklist-progress.ts`.
+- **Update placeholder Link Penting:**
+  - Teks placeholder diubah dari "Container link dokumen telah disiapkan..." menjadi "Akan segera diperbarui."
+  - File: `components/link-container.tsx`.
 
-- **Tombol Reset diperkecil:** style diubah menjadi tombol teks ringan dengan ikon, tidak lagi memakan ruang besar.
-
-- **Generator script diperbarui:**
-  - `scripts/extract-checklist-data.py` mengekstrak `BidangList`, mapping prodi tujuan, dan daftar instansi KLPD dari Excel.
-  - Menghasilkan `lib/data/reference-data.ts` dan meregenerasi `lib/data/checklist-data.ts` dengan metadata field Data Awal.
-
-- **State & storage:**
-  - `useChecklistProgress` menyimpan state `dataAwal` terpisah dari checkbox.
-  - Storage version naik ke **v2** — data lama v1 di-reset otomatis.
-  - Export/Import JSON mencakup Data Awal.
-
-- **Git workflow:** branch `feat/data-awal-form-and-progress` → conventional commit → push → merge → push `main`.
-- **Deploy Vercel production:** https://checklist-peserta-kemenkeu-dan-klpd.vercel.app
+- **Verifikasi & deploy:**
+  - `npm run typecheck` dan `npm run build` lolos tanpa error.
+  - Branch `feat/dokumen-subjek-grouping` → conventional commit → push → merge → push `main`.
+  - Deploy Vercel production: https://checklist-peserta-kemenkeu-dan-klpd.vercel.app
 
 ---
 
@@ -53,29 +45,36 @@ Perubahan dikerjakan di branch `feat/data-awal-form-and-progress`, di-merge ke `
 - **Mutual exclusivity di dropdown lebih baik daripada validasi error pasca-pilih.** Mencegah duplikat sejak awal lebih ramah pengguna daripada menampilkan status merah setelah terjadi kesalahan.
 - **Build Next.js di Vercel kadang menghasilkan lambda functions, bukan static pages.** Hal ini normal untuk App Router tanpa `output: 'export'`; yang penting deployment status Ready dan konten bisa diakses melalui canonical domain.
 - **Clean rebuild (hapus `.next`) sering diperlukan setelah perubahan besar.** Dev server yang berjalan di background dapat menyebabkan cache build korup dan error `PageNotFoundError`.
+- **Saat menormalisasi label, pertahankan ID lama untuk kompatibilitas localStorage.** Mengubah label menjadi slug untuk ID akan mereset progress pengguna yang tersimpan di browser. Dengan memisahkan `id` (dari header asli) dan `label` (ternormalisasi), data progres tetap valid.
+- **Menambahkan field `subject` lebih bersih daripada parse label di render time.** Grouping di komponen menjadi lebih sederhana dan type-safe; parsing regex hanya sebagai fallback.
+- **Pewarnaan sub-bagian memerlukan kontras yang cukup dan ikon yang jelas.** Kombinasi border-top tebal + header background tinted + ikon kecil membuat perbedaan subjek terlihat bahkan saat di-scroll cepat.
 
 ## Next Action Recommended
 
-1. **Isi container Link Penting**
-   File: `lib/data/checklist-data.ts` (field `link`) atau file konfigurasi terpisah.
-   Mengapa: User sedang mengumpulkan link format dokumen; container sudah siap di UI.
+1. **Isi container Link Penting dengan URL format dokumen**
+   File: `scripts/extract-checklist-data.py` (sumber link dari Excel) atau konfigurasi terpisah, lalu regenerate `lib/data/checklist-data.ts`.
+   Mengapa: Placeholder sudah diupdate; container UI sudah siap. Mengisi link akan menyelesaikan fitur ini sepenuhnya.
 
-2. **Pindahkan repo keluar dari Desktop (opsional tapi direkomendasikan)**
+2. **Tambahkan badge/tanda visual untuk item yang memerlukan perhatian khusus**
+   File: `components/checklist-row.tsx`.
+   Mengapa: Beberapa item punya `rawFlag` seperti "Wajib untuk DJBC" yang belum ditampilkan di UI; menampilkannya membantu pengguna memahami konteks khusus.
+
+3. **Pindahkan repo keluar dari Desktop (opsional tapi direkomendasikan)**
    Target: `~/codex/checklist-peserta-kemenkeu-dan-klpd` atau lokasi non-Desktop lain.
    Mengapa: Menghindari masalah permission macOS (`EPERM`) saat development lokal.
 
-3. **Update README fitur**
+4. **Update README fitur**
    File: `README.md`.
-   Mengapa: Dokumentasi perlu mencerminkan Data Awal sebagai form input, progress sticky, mutual exclusivity, dan hilangnya persentase.
+   Mengapa: Dokumentasi perlu mencerminkan pengelompokan Checklist Dokumen berdasarkan subjek dan standarisasi label terbaru.
 
-4. **Upgrade Next.js ke versi patched**
+5. **Upgrade Next.js ke versi patched**
    File: `package.json`.
    Mengapa: Next.js 14.2.21 memiliki vulnerability yang diumumkan; upgrade ke 14.2.28+ atau 15.x.
 
-5. **Tambahkan analytics/error tracking (opsional)**
+6. **Tambahkan analytics/error tracking (opsional)**
    Mengapa: Untuk memantau penggunaan aplikasi setelah go-live.
 
-6. **Custom domain (opsional)**
+7. **Custom domain (opsional)**
    Mengapa: URL Vercel bawaan panjang; custom domain meningkatkan trust dan kemudahan akses.
 
 ## Status Proyek
@@ -92,7 +91,11 @@ Perubahan dikerjakan di branch `feat/data-awal-form-and-progress`, di-merge ke `
 | STATUS PILIHAN PRODI terkomputasi | ✅ Done |
 | Hidden Data Awal fields | ✅ Done |
 | State management | ✅ Done |
+| Label PIC→Subjek standardization | ✅ Done |
+| Checklist Dokumen grouped by subject | ✅ Done |
+| Link Penting placeholder updated | ✅ Done |
 | Quality gate | ✅ Passed |
 | GitHub repo | ✅ Done |
 | Vercel deploy | ✅ Live |
-| Link dokumen | ⏳ Pending (container ready) |
+| Link dokumen aktual | ⏳ Pending |
+| Display rawFlag context in UI | ⏳ Pending |
