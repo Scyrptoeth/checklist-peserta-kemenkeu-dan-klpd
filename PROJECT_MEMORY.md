@@ -2,6 +2,42 @@
 
 ## Latest Update
 
+**2026-06-28 — Update label section dengan referensi resmi, hyperlink aktif, dan reorder Checklist Dokumen ke atas.**
+
+Perubahan dikerjakan di branch `update-label-checklist`, di-merge ke `main`, dan di-deploy ke Vercel production.
+
+- **Data Awal (semua klaster & sub-klaster):**
+  - Subtitle diubah dari "Informasi dasar Calon Peserta" menjadi "Sesuai dengan Kertas Kerja yang Dibagikan oleh PKN STAN di https://taplink.cc/formulirspmbpt2026" dengan link klikable.
+  - File: `components/data-awal-section.tsx`, `components/checklist-page-client.tsx`.
+
+- **Checklist Non-Dokumen:**
+  - Kemenkeu & sub-klaster: subtitle diubah menjadi "Sesuai dengan Pasal 6 PMK 34 Tahun 2024 tentang Pengelolaan Tugas Belajar bagi PNS di Lingkungan Kemenkeu yang bisa Diunduh di s.id/PMK-Tubel-Kemenkeu" dengan link klikable.
+  - KLPD: subtitle diubah menjadi "Sesuai dengan Ketentuan Kepegawaian/Tugas Belajar yang Berlaku di KLPD Masing-Masing".
+  - File: `components/checklist-section.tsx`, `components/checklist-page-client.tsx`.
+
+- **Checklist Dokumen:**
+  - DJBC: "Sesuai dengan PENG-31/BC.01/2026 yang dapat Diunduh di s.id/Tubel-DJBC-2026" dengan link klikable.
+  - DJPb: "Sesuai dengan ND-2360/PB.1/2026 yang dapat Diunduh di s.id/Tubel-DJPb-2026" dengan link klikable.
+  - DJP: "Sesuai dengan PENG-380/PJ/PJ.01/2026 yang dapat Diunduh di s.id/Tubel-DJP-2026" dengan link klikable.
+  - UE-1 (Kemenkeu) & KLPD: "Sesuai dengan PENG-19/PKN/2026 yang dapat Diunduh di s.id/PENG-Tubel-2026" dengan link klikable.
+  - File: `components/checklist-dokumen-section.tsx`, `components/checklist-page-client.tsx`.
+
+- **Reorder section:**
+  - Urutan di semua klaster & sub-klaster diubah menjadi: Data Awal → Checklist Dokumen → Checklist Non-Dokumen.
+  - File: `components/checklist-page-client.tsx`.
+
+- **Komponen reusable untuk inline external link:**
+  - `InlineExternalLink` ditambahkan di `components/checklist-page-client.tsx` untuk menyediakan style konsisten pada link eksternal (underline, brand color, icon external-link).
+
+- **Verifikasi & deploy:**
+  - `npm run build` lolos tanpa error.
+  - Branch `update-label-checklist` → conventional commit → push → merge → push `main`.
+  - Deploy Vercel production: https://checklist-peserta-kemenkeu-dan-klpd.vercel.app
+
+---
+
+## Latest Update
+
 **2026-06-28 — Sticky header dengan logo di kanan blok judul, penambahan 2 dokumen Subjek: Unit Kerja untuk KLPD, dan deploy production.**
 
 Perubahan dikerjakan di branch `feat/klpd-unit-kerja-dokumen`, di-merge ke `main`, dan di-deploy ke Vercel production.
@@ -67,6 +103,10 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 
 ## Lesson Learned
 
+- **Prop subtitle/category sebaiknya diteruskan sebagai `React.ReactNode`, bukan `string`.** Karena label section sekarang berisi hyperlink eksternal, tipe string tidak cukup. Mengubah tipe menjadi `React.ReactNode` membuat komponen lebih fleksibel tanpa merusak existing behavior.
+- **`git add -A` berisiko mengcommit file untracked yang tidak terkait.** Dua asset gambar (`update/3-logo.png` dan `update/4-footer.png`) ikut tercommit bersama perubahan kode. Untuk sesi berikutnya, gunakan `git add <file>` secara selektif atau review `git status` sebelum commit.
+- **External link harus memiliki indikator visual dan atribut keamanan.** Kombinasi `target="_blank"`, `rel="noopener noreferrer"`, underline, dan icon external-link memenuhi ekspektasi accessibility dan keamanan.
+- **Urutan section sebaiknya dikontrol di satu tempat (page client).** Dengan menyusun urutan di `ChecklistPageClient`, perubahan layout berlaku konsisten untuk semua klaster/sub-klaster.
 - **Data auto-generated harus diupdate lewat generator script, bukan edit manual.** Field Data Awal yang disembunyikan ditandai di `scripts/extract-checklist-data.py` sebagai `HIDDEN_DATA_AWAL_LABELS`, lalu `lib/data/checklist-data.ts` diregenerasi. Ini menjaga konsistensi jika Excel berubah di masa depan.
 - **`applies: false` adalah cara paling bersih untuk menyembunyikan item dari UI dan progress.** Karena hook dan komponen sudah filter berdasarkan `applies`, satu perubahan di data file menyelesaikan dua masalah sekaligus (tidak ditampilkan + tidak masuk progress).
 - **Sticky sidebar membutuhkan parent flex dengan `align-items: stretch`.** Jika parent menggunakan `items-start`, kolom kiri hanya setinggi kontennya sendiri sehingga sticky tidak bisa mengikuti scroll.
@@ -84,26 +124,30 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
    File: `scripts/extract-checklist-data.py` (sumber link dari Excel) atau konfigurasi terpisah, lalu regenerate `lib/data/checklist-data.ts`.
    Mengapa: Placeholder sudah diupdate; container UI sudah siap. Mengisi link akan menyelesaikan fitur ini sepenuhnya.
 
-2. **Tambahkan badge/tanda visual untuk item yang memerlukan perhatian khusus**
+2. **Verifikasi URL link eksternal secara berkala**
+   Link: `s.id/PMK-Tubel-Kemenkeu`, `s.id/Tubel-DJBC-2026`, `s.id/Tubel-DJPb-2026`, `s.id/Tubel-DJP-2026`, `s.id/PENG-Tubel-2026`, `https://taplink.cc/formulirspmbpt2026`.
+   Mengapa: Shortlink atau halaman eksternal bisa berubah; verifikasi memastikan pengguna tidak mengalami broken link.
+
+3. **Tambahkan badge/tanda visual untuk item yang memerlukan perhatian khusus**
    File: `components/checklist-row.tsx`.
    Mengapa: Beberapa item punya `rawFlag` seperti "Wajib untuk DJBC" yang belum ditampilkan di UI; menampilkannya membantu pengguna memahami konteks khusus.
 
-3. **Pindahkan repo keluar dari Desktop (opsional tapi direkomendasikan)**
+4. **Pindahkan repo keluar dari Desktop (opsional tapi direkomendasikan)**
    Target: `~/codex/checklist-peserta-kemenkeu-dan-klpd` atau lokasi non-Desktop lain.
    Mengapa: Menghindari masalah permission macOS (`EPERM`) saat development lokal.
 
-4. **Update README fitur**
+5. **Update README fitur**
    File: `README.md`.
-   Mengapa: Dokumentasi perlu mencerminkan pengelompokan Checklist Dokumen berdasarkan subjek dan standarisasi label terbaru.
+   Mengapa: Dokumentasi perlu mencerminkan label section terbaru, hyperlink referensi, dan urutan section yang diubah.
 
-5. **Upgrade Next.js ke versi patched**
+6. **Upgrade Next.js ke versi patched**
    File: `package.json`.
    Mengapa: Next.js 14.2.21 memiliki vulnerability yang diumumkan; upgrade ke 14.2.28+ atau 15.x.
 
-6. **Tambahkan analytics/error tracking (opsional)**
+7. **Tambahkan analytics/error tracking (opsional)**
    Mengapa: Untuk memantau penggunaan aplikasi setelah go-live.
 
-7. **Custom domain (opsional)**
+8. **Custom domain (opsional)**
    Mengapa: URL Vercel bawaan panjang; custom domain meningkatkan trust dan kemudahan akses.
 
 ## Status Proyek
@@ -125,8 +169,11 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 | Link Penting placeholder updated | ✅ Done |
 | Sticky header with logo (title left, logo right) | ✅ Done |
 | KLPD Unit Kerja dokumen items added | ✅ Done |
+| Section labels with official references & links | ✅ Done |
+| Reorder: Data Awal → Dokumen → Non-Dokumen | ✅ Done |
 | Quality gate | ✅ Passed |
 | GitHub repo | ✅ Done |
 | Vercel deploy | ✅ Live |
-| Link dokumen aktual | ⏳ Pending |
+| Link dokumen aktual | ✅ Done (subtitle links) |
+| Container Link Penting filled | ⏳ Pending |
 | Display rawFlag context in UI | ⏳ Pending |
