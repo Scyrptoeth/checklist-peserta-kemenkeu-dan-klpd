@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-import { COOKIE_NAME } from "@/lib/developer/session";
+import { getCookieName } from "@/lib/developer/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST() {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  cookieStore.delete(getCookieName());
   return NextResponse.json({ ok: true });
 }

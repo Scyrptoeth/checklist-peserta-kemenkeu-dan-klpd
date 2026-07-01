@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { kemenkeuClusters } from "@/lib/data/checklist-data";
 import { AnonymousFeedback } from "@/components/anonymous-feedback";
 import { SiteFooter } from "@/components/site-footer";
 import { StickyPageHeader } from "@/components/sticky-page-header";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default function KemenkeuSelectPage() {
   return (

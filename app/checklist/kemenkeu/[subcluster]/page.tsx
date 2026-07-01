@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import {
   getClusterChecklist,
   kemenkeuClusters,
@@ -13,12 +14,13 @@ export function generateStaticParams() {
   return kemenkeuClusters.map((c) => ({ subcluster: c.id }));
 }
 
-export function generateMetadata({ params }: Props) {
+export function generateMetadata({ params }: Props): Metadata {
   const cluster = kemenkeuClusters.find((c) => c.id === params.subcluster);
   return {
     title: cluster
       ? `Checklist ${cluster.label} — SPMB PT PKN STAN 2026`
       : "Checklist Tidak Ditemukan",
+    robots: { index: false, follow: false },
   };
 }
 

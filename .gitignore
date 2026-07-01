@@ -30,6 +30,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# update assets (temporary reference images)
+/update
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

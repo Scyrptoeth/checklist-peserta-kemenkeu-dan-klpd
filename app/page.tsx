@@ -3,10 +3,14 @@ import { ArrowRight, BookOpen, Building2, Landmark } from "lucide-react";
 import { AnonymousFeedback } from "@/components/anonymous-feedback";
 import { SiteFooter } from "@/components/site-footer";
 import { StickyPageHeader } from "@/components/sticky-page-header";
+import { PromoModal } from "@/components/promo-modal";
+
+const PROMO_STORAGE_KEY = "checklist-peserta-promo-tubelstan-2026-07-01";
 
 export default function HomePage() {
   return (
     <main className="min-h-dvh bg-ink-50">
+      <PromoModal storageKey={PROMO_STORAGE_KEY} />
       <StickyPageHeader
         title="Ceklis Tubel"
         subtitle="Seluruh Data 100% Aman sebab Hanya Tersimpan secara Otomatis di Perangkat yang Kamu Gunakan."

@@ -2,14 +2,14 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
 const COOKIE_NAME = "developer_session";
-const COOKIE_MAX_AGE_SECONDS = 7 * 24 * 60 * 60; // 7 days
+const COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60; // 1 day
 
 function getSecret(): Uint8Array {
-  const password = process.env.DEVELOPER_PASSWORD;
-  if (!password) {
-    throw new Error("DEVELOPER_PASSWORD is required for developer session.");
+  const secret = process.env.DEVELOPER_JWT_SECRET ?? process.env.DEVELOPER_PASSWORD;
+  if (!secret) {
+    throw new Error("DEVELOPER_JWT_SECRET (or DEVELOPER_PASSWORD fallback) is required for developer session.");
   }
-  return new TextEncoder().encode(password);
+  return new TextEncoder().encode(secret);
 }
 
 export interface DeveloperSession {
@@ -22,7 +22,7 @@ export async function signDeveloperSession(): Promise<string> {
   return new SignJWT({ role: "developer" })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime("1d")
     .sign(secret);
 }
 
@@ -45,23 +45,30 @@ export async function verifyDeveloperSession(
   }
 }
 
+export function getCookieName(): string {
+  return getCookieConfig().name;
+}
+
 export async function getDeveloperSessionFromCookie(): Promise<DeveloperSession | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const token = cookieStore.get(getCookieName())?.value;
   if (!token) return null;
   return verifyDeveloperSession(token);
 }
 
 export function getCookieConfig(): {
+  name: string;
   httpOnly: boolean;
   secure: boolean;
   sameSite: "lax";
   path: string;
   maxAge: number;
 } {
+  const isProduction = process.env.NODE_ENV === "production";
   return {
+    name: isProduction ? "__Host-developer_session" : COOKIE_NAME,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     sameSite: "lax",
     path: "/",
     maxAge: COOKIE_MAX_AGE_SECONDS,

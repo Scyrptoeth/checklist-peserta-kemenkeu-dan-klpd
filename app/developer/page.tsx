@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { DeveloperDashboard } from "@/components/developer-dashboard";
 import { DeveloperLoginForm } from "@/components/developer-login-form";
 import { getDeveloperSessionFromCookie } from "@/lib/developer/session";
@@ -6,6 +7,10 @@ import {
   getFeedbackSql,
   type DeveloperFeedbackRow,
 } from "@/lib/feedback/database";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

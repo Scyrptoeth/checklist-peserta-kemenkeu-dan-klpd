@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { timingSafeEqual } from "crypto";
 
 import {
-  COOKIE_NAME,
   getCookieConfig,
   signDeveloperSession,
 } from "@/lib/developer/session";
@@ -51,7 +50,8 @@ export async function POST(request: Request) {
 
   const token = await signDeveloperSession();
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, token, getCookieConfig());
+  const config = getCookieConfig();
+  cookieStore.set(config.name, token, config);
 
   return NextResponse.json({ ok: true });
 }

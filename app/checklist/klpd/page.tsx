@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import { getClusterChecklist, klpdCluster } from "@/lib/data/checklist-data";
 import { ChecklistPageClient } from "@/components/checklist-page-client";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Checklist KLPD — SPMB PT PKN STAN 2026",
+  robots: { index: false, follow: false },
 };
 
 export default function KlpdChecklistPage() {
