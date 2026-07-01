@@ -2,6 +2,48 @@
 
 ## Latest Update
 
+**2026-07-01 — Promo modal Tubel STAN one-time, hapus Nota Dinas dari seluruh klaster, update image promo terbaru, dan deploy production.**
+
+- **Promo modal one-time di landing page:**
+  - Komponen baru `components/promo-modal.tsx` mengikuti pola `PromoModal` dari website Persiapan U-Kom & Grading.
+  - Muncul sekali saja untuk pengguna yang belum pernah membuka website setelah update ini, menggunakan `localStorage` key `checklist-peserta-promo-tubelstan-2026-07-01`.
+  - Bisa ditutup via tombol ×, klik overlay, atau tombol Escape.
+  - Gambar promo dan CTA di bawahnya clickable ke `https://s.id/tubelstan`.
+  - Integrasi di `app/page.tsx`.
+
+- **Image promo terbaru:**
+  - `update/9-iklan.jpeg` versi terbaru disalin ke `public/iklan-tubelstan.jpeg`.
+  - Ukuran modal diperkecil (max-width 320px mobile / 360px desktop) agar tidak terpotong di viewport desktop.
+  - Overlay diubah menjadi scrollable dengan `items-start` + `my-auto` sehingga modal tetap center jika muat dan bisa di-scroll jika viewport pendek.
+
+- **Update kuota CTA:**
+  - Teks CTA bawah modal diubah dari "Tersisa 5 Kuota..." menjadi "Tersisa 3 Kuota...".
+  - Alt text image disesuaikan.
+
+- **Hapus item Nota Dinas Usulan Pendaftar SPMB TB:**
+  - Dihapus dari `lib/data/checklist-data.ts` untuk seluruh klaster dan sub-klaster:
+    - Kemenkeu: DJBC, DJP, DJPb, UE-1
+    - KLPD
+  - Progress keseluruhan berkurang: DJBC dari 31→30, KLPD dari 12→11.
+
+- **Pertahankan PromoBanner lama:**
+  - `PromoBanner` tetap ditampilkan di halaman checklist (`components/checklist-page-client.tsx`) sebagai alat promo utama yang selalu muncul.
+
+- **Aset update folder di-ignore:**
+  - `/update` ditambahkan ke `.gitignore` agar file referensi sementara tidak ikut tercommit.
+
+- **Git, push, dan deployment:**
+  - Rebase remote commit `f6a7d27 Update promo-banner.tsx` sebelum push.
+  - Commit final: `ea232fe feat(promo): add one-time Tubel STAN promo modal and update checklist data`.
+  - Push ke `origin/main` berhasil.
+  - Vercel production deploy berhasil: `https://checklist-peserta-kemenkeu-dan-klpd-i6it91g0a.vercel.app`.
+  - Alias production terverifikasi: `https://ceklis-tubel.vercel.app`.
+  - Screenshot live menunjukkan modal center, image ter-load, close button terlihat, dan CTA "Tersisa 3 Kuota".
+
+---
+
+## Latest Update
+
 **2026-06-28 — Rebuild Buku Panduan dari nol dengan font Shree Devanagari 714, screenshot utuh tanpa crop, push, dan deploy production.**
 
 - **Buku Panduan baru:**
@@ -231,6 +273,10 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 - **Generate screenshot sebelum generate PDF agar gambar sudah tersedia saat halaman panduan dirender.** Urutan ini menghindari broken image di PDF akhir.
 - **Menyertakan PDF dan screenshot di `public/` memudahkan deployment static file.** Vercel secara otomatis melayani file-file tersebut di root domain.
 - **Tombol sekunder di landing page sebaiknya tidak bersaing dengan CTA utama.** Menggunakan outlined button dengan icon membedakan Buku Panduan dari kartu klaster utama.
+- **Modal dengan gambar vertikal memerlukan batasan ukuran agar tidak terpotong di viewport desktop.** Menggunakan `max-width` lebih kecil (320px mobile / 360px desktop) dan overlay scrollable (`items-start` + `my-auto`) memastikan modal center dan utuh tanpa terpotong.
+- **Next.js Image di Vercel mungkin butuh waktu load saat pertama kali deploy.** Screenshot otomatis perlu `wait-for-timeout` agar image sempat dirender; endpoint `/_next/image` merespons 200 tetapi rendering bisa sedikit tertunda.
+- **Rebase remote commit sebelum push menghindari rejected ref.** Remote sempat memiliki commit `Update promo-banner.tsx`; `git pull --rebase origin main` menyelesaikan konflik dengan clean history.
+- **File referensi sementara sebaiknya di-ignore agar tidak ikut tercommit.** Menambahkan `/update` ke `.gitignore` menjaga repository tetap bersih dari aset diskusi yang tidak perlu di-versioning.
 
 ## Next Action Recommended
 
@@ -276,6 +322,14 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
     Target: `npm i -g vercel@latest` atau `pnpm add -g vercel@latest`.
     Mengapa: CLI lokal masih `54.14.2`, sedangkan versi tersedia `54.18.1`; versi baru lebih sesuai untuk workflow agentic dan deploy berikutnya.
 
+12. **Verifikasi promo modal di production pada berbagai viewport**
+    Target: `https://ceklis-tubel.vercel.app` di desktop, tablet, dan mobile.
+    Mengapa: Modal one-time hanya muncul sekali; pastikan center, tidak terpotong, dan close button selalu terlihat di semua ukuran layar.
+
+13. **Perbarui Buku Panduan jika dianggap perlu**
+    File: `scripts/generate-guide.mjs`, `public/guide-screenshots/`, `public/buku-panduan.pdf`.
+    Mengapa: UI landing page sekarang memiliki promo modal; panduan mungkin perlu mencakup penjelasan modal iklan tersebut.
+
 ## Status Proyek
 
 | Area | Status |
@@ -308,6 +362,9 @@ Perubahan dikerjakan di branch `feat/dokumen-subjek-grouping`, di-merge ke `main
 | GitHub repo | ✅ Done |
 | Vercel deploy | ✅ Live |
 | Link dokumen aktual | ✅ Done (subtitle links) |
+| One-time Tubel STAN promo modal | ✅ Done |
+| Nota Dinas removed from all clusters | ✅ Done |
+| Latest promo image (9-iklan.jpeg) | ✅ Done |
 | Container Link Penting filled | ⏳ Pending |
 | Display rawFlag context in UI | ⏳ Pending |
 | Vercel CLI latest | ⏳ Pending (`54.14.2` → `54.18.1`) |
